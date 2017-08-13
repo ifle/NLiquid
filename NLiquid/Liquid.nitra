@@ -1,0 +1,15 @@
+﻿using Nitra;
+using System.Globalization;
+
+syntax module NumParser
+{
+  regex d = ['0'..'9'];
+  regex numberBody = d+ ('.' d+)?;
+
+  [StartRule, ExplicitSpaces]
+  token number = numberBody
+  {
+    Value() : double = double.Parse(GetText(this.NumberBody), CultureInfo.InvariantCulture);
+    missing Value = double.NaN;
+  }
+}
