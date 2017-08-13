@@ -54,6 +54,7 @@ artifacts/
 *.ilk
 *.meta
 *.obj
+*.ncb
 *.pch
 *.pdb
 *.pgc
@@ -64,6 +65,9 @@ artifacts/
 *.tli
 *.tlh
 *.tmp
+*.bak
+*.cache
+*.ilk
 *.tmp_proj
 *.log
 *.vspscc
@@ -286,3 +290,16 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+*.Generated.n
+Nitra/log.txt
+Nitra/Boot2/Net-4.0
+Doc/JsonParser.html
+Doc/JsonParser.xml
+*.stackdump
+Doc/Nitra-doc.html
+Doc/Nitra-doc.xml
+Doc/~$tra-doc.doc
+Nitra.gpState
+*.gpState
+Doc/~$*
