@@ -1,15 +1,19 @@
-﻿using Nitra;
-using System.Globalization;
-
-syntax module NumParser
+﻿namespace Parser
 {
-  regex d = ['0'..'9'];
-  regex numberBody = d+ ('.' d+)?;
+	
+	syntax module NLiquid
+	{  
+	  using Nitra.Core;
+	  using Nitra.CStyleComments;
 
-  [StartRule, ExplicitSpaces]
-  token number = numberBody
-  {
-    Value() : double = double.Parse(GetText(this.NumberBody), CultureInfo.InvariantCulture);
-    missing Value = double.NaN;
-  }
+	  [StartRule]
+	  syntax Start = "hello";
+
+	}	
 }
+
+language NLiquid
+	{
+	  syntax module Parser.NLiquid start rule Start;
+	}
+

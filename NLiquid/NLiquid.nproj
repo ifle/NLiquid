@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NLiquid</RootNamespace>
     <AssemblyName>NLiquid</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NoStdLib>true</NoStdLib>
     <NemerleVersion>Net-4.0</NemerleVersion>
@@ -25,6 +25,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <StartProgram>D:\Dev\GitHub\nitra\bin\Debug\Stage1\Nitra.Visualizer.exe</StartProgram>
+    <WorkingDirectory />
+    <CmdArgs />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -36,17 +39,17 @@
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <MacroReference Include="Nitra.Compiler, Version=0.0.0.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+    <MacroReference Include="Nitra.Compiler, Version=0.1.4115.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
       <Name>Nitra.Compiler</Name>
       <AssemblyName>Nitra.Compiler.dll</AssemblyName>
-      <HintPath>..\..\..\Nitra\Boot2\Net-4.0\Nitra.Compiler.dll</HintPath>
+      <HintPath>..\..\..\nitra\bin\Debug\Stage1\Nitra.Compiler.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
     <Reference Include="mscorlib" />
-    <Reference Include="Nitra.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
+    <Reference Include="Nitra.Runtime, Version=0.1.4115.0, Culture=neutral, PublicKeyToken=e080a9c724e2bfcd">
       <Name>Nitra.Runtime</Name>
       <AssemblyName>Nitra.Runtime.dll</AssemblyName>
-      <HintPath>..\..\..\Nitra\Boot2\Net-4.0\Nitra.Runtime.dll</HintPath>
+      <HintPath>..\..\..\nitra\bin\Debug\Stage1\Nitra.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">

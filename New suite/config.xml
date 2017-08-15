@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Languages>
+    <Language Name="NLiquid" Path="D:\Dev\GitHub\ifle\NLiquid\NLiquid\bin\Debug\NLiquid.dll">
+      <DynamicExtensions />
+    </Language>
+  </Languages>
+  <References />
+</Config>
