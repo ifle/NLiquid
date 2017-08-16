@@ -3,12 +3,25 @@
 	
 	syntax module NLiquid
 	{  
-	  using Nitra.Core;
-	  using Nitra.CStyleComments;
+		using Nitra.Core;
+		using Nitra.CStyleComments;
+		using Nitra.Identifiers;
 
-	  [StartRule]
-	  syntax Start = "hello";
+		keyword regex ['a'..'z', '_'..'_']+ rule S;
 
+		[StartRule]		
+		syntax Start = Content?;
+
+		syntax Content
+		{
+			| Block = Part
+			//| Plain = Any+?
+		}
+		
+		syntax Part
+		{
+			| Object = "{{" IdentifierBody "}}"
+		}		
 	}	
 }
 
