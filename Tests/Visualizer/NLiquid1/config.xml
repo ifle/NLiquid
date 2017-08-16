@@ -2,7 +2,7 @@
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ProjectSupport Caption="" TypeFullName="" Path="" />
   <Languages>
-    <Language Name="NLiquid" Path="D:\Dev\GitHub\ifle\NLiquid\NLiquid\bin\Debug\NLiquid.dll">
+    <Language Name="NLiquid" Path="..\..\..\NLiquid\bin\Debug\NLiquid.dll">
       <DynamicExtensions />
     </Language>
   </Languages>
