@@ -1,13 +1,13 @@
 ﻿namespace Parser
 {
   [ExplicitSpaces]
-	syntax module NLiquid
-	{  
-		using Nitra.Core;
-		using Nitra.CStyleComments;
-		using Nitra.Identifiers;
+  syntax module NLiquid
+  {  
+    using Nitra.Core;
+    using Nitra.CStyleComments;
+    using Nitra.Identifiers;
 
-		keyword regex ['a'..'z', '_'..'_']+ rule S;
+    keyword regex ['a'..'z', '_'..'_']+ rule S;
 
     extend token IgnoreToken
     {
@@ -17,14 +17,14 @@
     token Reference = IdentifierBody;
     token Name      = IdentifierBody;
 
-		syntax Start = Content*;
+    syntax Start = Content*;
 
-		syntax Content
-		{
-			| Atom
-			| Plain = (!Atom Any)+
-		}
-		
+    syntax Content
+    {
+      | Atom
+      | Plain = (!Atom Any)+
+    }
+    
     syntax Atom
     {
       | Tag
@@ -32,9 +32,9 @@
       | Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm Expr s sm Filter? "%}"
     }
 
-		syntax Tag
-		{
-		}
+    syntax Tag
+    {
+    }
     
     // Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае, 
     // если пользователь накосячит с выражением.
@@ -60,11 +60,11 @@
     {
     // сюда надо добавить остальные теги
     }
-	}	
+  }
 }
 
 language NLiquid
 {
-	syntax module Parser.NLiquid start rule Start;
+  syntax module Parser.NLiquid start rule Start;
 }
 
