@@ -1,12 +1,13 @@
 ﻿
-/*
+
 namespace NLiquid.Parser
 {   	
+	
 	map syntax Grammar.Contents -> CompilationUnit
     {  
-        Contents -> Statements;
+        //Contents -> Statements;
     }
-
+	/*
 	map syntax Grammar.Content -> Statement
 	{
 		| Atom
@@ -18,5 +19,6 @@ namespace NLiquid.Parser
 		
 		|	Plain -> PlainStatement
 	}		
+	*/
 }
-*/
+

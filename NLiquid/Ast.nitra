@@ -2,20 +2,18 @@
 using Nitra.Declarations;
 using Nitra.Runtime;
 using NLiquid;
-using NLiquid;
 using System.IO;
+
 namespace NLiquid.Parser
 {
 	ast CompilationUnit
 	{
-		Statements : Statement*;
+		//Statements : Statement*;
 	}	
 
-	abstract ast Statement 	
-	{ 
-		stage 1:
-		  in  Scope  : Scope;
-		  //out Result : NLiquidValue;	
+	abstract ast Statement : BindableAst
+	{ 		
+		//out Result : NLiquidValue;		  
 	}
 
 	ast PlainStatement : Statement
@@ -24,11 +22,9 @@ namespace NLiquid.Parser
 	  //Value : NLiquidValue;
 	}
 	
-	abstract ast Expression
+	abstract ast Expression : BindableAst
 	{
-		stage 1:	  
-		  in  Scope  : Scope;
-		  out Result : NLiquidValue;		
+		out Result : NLiquidValue;		
 	}
 	
 	ast OutputStatement : Statement
