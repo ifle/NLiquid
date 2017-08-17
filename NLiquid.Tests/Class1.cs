@@ -11,7 +11,7 @@ namespace NLiquid.Tests
 		[Test]
 		public void  WillbeRemoved()
 	    {
-		    var parseResult = Grammar.Start.Parse(new SourceSnapshot("{{hello}}"));
+		    var parseResult = Grammar.Contents.Parse(new SourceSnapshot("{{hello}}"));
 			Debug.WriteLine(parseResult);
 	    }
     }

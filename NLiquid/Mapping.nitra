@@ -1,0 +1,22 @@
+﻿
+/*
+namespace NLiquid.Parser
+{   	
+	map syntax Grammar.Contents -> CompilationUnit
+    {  
+        Contents -> Statements;
+    }
+
+	map syntax Grammar.Content -> Statement
+	{
+		| Atom
+		{
+			Tag		   -> PlainStatement;
+			Output     -> OutputStatement;
+			Assignment -> PlainStatement;
+		}
+		
+		|	Plain -> PlainStatement
+	}		
+}
+*/

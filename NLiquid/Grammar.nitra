@@ -1,27 +1,28 @@
-﻿namespace NLiquid.Parser
+﻿
+namespace NLiquid.Parser
 {
   [ExplicitSpaces]
   syntax module Grammar
-  {  
-    using Nitra.Core;
+  { 	
+	using Nitra.Core;
     using Nitra.CStyleComments;
     using Nitra.Identifiers;
 
     keyword regex ['a'..'z', '_'..'_']+ rule S;
-
+	
     extend token IgnoreToken
     {
       | SpaceToken = Spaces;
     }
 
-    token Reference = IdentifierBody;
+	token Reference = IdentifierBody;
     token Name      = IdentifierBody;
 
-    syntax Start = Content*;
+    syntax Contents = Content*;
 
     syntax Content
-    {
-      | Atom
+    {      
+	  | Atom
       | Plain = (!Atom Any)+
     }
     
@@ -31,7 +32,7 @@
       | Output      = "{{" s sm OutputExpr s sm  "}}"
       | Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm Expr s sm Filter? "%}"
     }
-
+	
     syntax Tag
     {
     }

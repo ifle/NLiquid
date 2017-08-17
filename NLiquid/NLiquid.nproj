@@ -75,8 +75,20 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ast.nitra">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Context.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Grammar.nitra" />
     <Compile Include="Language.nitra">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mapping.nitra">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NLiquidValue.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />

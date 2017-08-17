@@ -1,0 +1,39 @@
+﻿using Nitra;
+using Nitra.Declarations;
+using Nitra.Runtime;
+using NLiquid;
+using NLiquid;
+using System.IO;
+namespace NLiquid.Parser
+{
+	ast CompilationUnit
+	{
+		Statements : Statement*;
+	}	
+
+	abstract ast Statement 	
+	{ 
+		stage 1:
+		  in  Scope  : Scope;
+		  out Result : NLiquidValue;	
+	}
+
+	ast PlainStatement : Statement
+	{	  
+	  Result = Value.ValueOrDefault;	  
+	  Value : NLiquidValue;
+	}
+	
+	abstract ast Expression
+	{
+		stage 1:	  
+		  in  Scope  : Scope;
+		  out Result : NLiquidValue;		
+	}
+	
+	ast OutputStatement : Statement
+	{	  
+	  Expression: Expression;	  	  
+	  Result = Expression.Result;	  
+	}
+}
