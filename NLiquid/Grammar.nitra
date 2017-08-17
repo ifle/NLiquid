@@ -1,4 +1,4 @@
-﻿namespace Parser
+﻿namespace NLiquid.Parser
 {
   [ExplicitSpaces]
   syntax module Grammar

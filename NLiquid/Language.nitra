@@ -1,4 +1,4 @@
-﻿language NLiquid
+﻿language Liquid
 {
-  syntax module Parser.Grammar start rule Start;
+  syntax module NLiquid.Parser.Grammar start rule Start;
 }
