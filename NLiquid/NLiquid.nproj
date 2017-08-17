@@ -75,7 +75,10 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Liquid.nitra" />
+    <Compile Include="Grammar.nitra" />
+    <Compile Include="Language.nitra">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>

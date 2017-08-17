@@ -1,0 +1,65 @@
+﻿namespace Parser
+{
+  [ExplicitSpaces]
+  syntax module Grammar
+  {  
+    using Nitra.Core;
+    using Nitra.CStyleComments;
+    using Nitra.Identifiers;
+
+    keyword regex ['a'..'z', '_'..'_']+ rule S;
+
+    extend token IgnoreToken
+    {
+      | SpaceToken = Spaces;
+    }
+
+    token Reference = IdentifierBody;
+    token Name      = IdentifierBody;
+
+    syntax Start = Content*;
+
+    syntax Content
+    {
+      | Atom
+      | Plain = (!Atom Any)+
+    }
+    
+    syntax Atom
+    {
+      | Tag
+      | Output      = "{{" s sm OutputExpr s sm  "}}"
+      | Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm Expr s sm Filter? "%}"
+    }
+
+    syntax Tag
+    {
+    }
+    
+    // Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае, 
+    // если пользователь накосячит с выражением.
+    syntax OutputExpr
+    {
+      | Expr
+      | Error = !(Expr s "}}") (!"}}" Any)+
+    }
+
+    syntax Expr
+    {
+      | Reference
+      | SStr = "'" (!"'" Any)* "'"
+      | DStr = '"' (!'"' Any)* '"'
+
+      // сюда над добавить остальные выражения.
+
+    precedence Primary:
+      | MemberAccess =  Expr s "." s Reference
+    }
+
+    syntax Filter
+    {
+    // сюда надо добавить остальные теги
+    }
+  }
+}
+
