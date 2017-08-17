@@ -15,13 +15,13 @@ namespace NLiquid.Parser
 	{ 
 		stage 1:
 		  in  Scope  : Scope;
-		  out Result : NLiquidValue;	
+		  //out Result : NLiquidValue;	
 	}
 
 	ast PlainStatement : Statement
 	{	  
-	  Result = Value.ValueOrDefault;	  
-	  Value : NLiquidValue;
+	  //Result = Value.ValueOrDefault;	  
+	  //Value : NLiquidValue;
 	}
 	
 	abstract ast Expression
@@ -34,6 +34,6 @@ namespace NLiquid.Parser
 	ast OutputStatement : Statement
 	{	  
 	  Expression: Expression;	  	  
-	  Result = Expression.Result;	  
+	  //Result = Expression.Result;	  
 	}
 }
