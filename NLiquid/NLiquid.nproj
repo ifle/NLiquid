@@ -78,9 +78,6 @@
     <Compile Include="Ast.nitra">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CompilationUnit.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Context.n">
       <SubType>Code</SubType>
     </Compile>
@@ -92,6 +89,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NLiquidValue.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProjectSupport.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.n" />

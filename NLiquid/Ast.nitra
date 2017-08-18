@@ -8,28 +8,27 @@ namespace NLiquid.Parser
 {
 	ast CompilationUnit
 	{
-		//Statements : Statement*;
-	}	
+		Statements : Statement*;
+	}
 
 	abstract ast Statement : BindableAst
-	{ 		
-		//out Result : NLiquidValue;		  
+	{
+		| Plain  { }
+    | Output { Expr : Expr; }
 	}
 
-	ast PlainStatement : Statement
-	{	  
-	  //Result = Value.ValueOrDefault;	  
-	  //Value : NLiquidValue;
-	}
-	
-	abstract ast Expression : BindableAst
+  declaration Assignment : Statement
+  {
+    Initializer : Expr;
+  }
+
+	abstract ast Expr : BindableAst
 	{
-		out Result : NLiquidValue;		
-	}
-	
-	ast OutputStatement : Statement
-	{	  
-	  Expression: Expression;	  	  
-	  //Result = Expression.Result;	  
+    | SStr         { Value : string; }
+    | DStr         { Value : string; }
+    | Ref          { Reference : Reference; }
+    | MemberAccess { Qualifier : Expr; Reference : Reference; }
+    | Error        { Error(context, "Expected: Expr '}}'"); }
+    | Call         { Func : Expr; Args : Expr*; }
 	}
 }
