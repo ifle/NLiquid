@@ -24,7 +24,10 @@ namespace NLiquid.Parser.Syntax
 		syntax Content
 		{
 			| Atom
-			| Plain = (!Atom Any)+
+			| Plain = (!TagStart Any)+
+				{
+				  regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
+				}
 		}
 
 		syntax Atom
@@ -40,12 +43,12 @@ namespace NLiquid.Parser.Syntax
 		}
 		
 		[SpanClass(MultilineComment)] 
-		syntax MultiLineComment  = Start s "comment" s End s Body=(!"{%" Any)* s Start s "endcomment" s End 
+		syntax MultiLineComment  = Start s sm "comment" s sm End s sm Body=(!"{%" Any)* s sm Start s sm "endcomment" s sm End 
 		{
-			//[SpanClass(OpenBrace)]
+			[SpanClass(OpenBrace)]
 			regex Start = "{%";
 
-			//[SpanClass(CloseBrace)]
+			[SpanClass(CloseBrace)]
 			regex End = "%}";
 		}
 
