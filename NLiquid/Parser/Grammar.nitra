@@ -9,15 +9,16 @@ namespace NLiquid.Parser.Syntax
 		using Nitra.Identifiers;
 
 		keyword regex ['a'..'z', '_']+ rule S;
-
+		token Reference		= IdentifierBody;
+		token Name			= IdentifierBody;
+		literal Op			= "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
+		literal OpenTag           = "{%";
+		literal CloseTag          = "%}";
 		extend token IgnoreToken
 		{
-			| SpaceToken = Spaces;
-		}
-
-		token Reference = IdentifierBody;
-		token Name      = IdentifierBody;
-
+			| SpaceToken = Spaces;			
+		}	
+		
 		syntax Contents = Content*;
 
 		syntax Content
@@ -30,11 +31,22 @@ namespace NLiquid.Parser.Syntax
 		{
 			| Tag
 			| Output      = "{{" s sm OutputExpr s sm  "}}"
-			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr "%}"
+			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
 		}
-
+		
 		syntax Tag
 		{
+			| Comment = MultiLineComment;
+		}
+		
+		[SpanClass(MultilineComment)] 
+		syntax MultiLineComment  = Start s "comment" s End s Body=(!"{%" Any)* s Start s "endcomment" s End 
+		{
+			//[SpanClass(OpenBrace)]
+			regex Start = "{%";
+
+			//[SpanClass(CloseBrace)]
+			regex End = "%}";
 		}
 
 		// Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае, 
