@@ -1,7 +1,8 @@
 ﻿using Nitra;
 using Nitra.Declarations;
-
-namespace NLiquid.Parser
+using NLiquid.Parser.Syntax;
+using NLiquid.Parser.Ast;
+namespace NLiquid.Parser.Mapping
 {
   map syntax Grammar.Reference -> Reference = Reference(this);
   map syntax Grammar.Name      -> Name      = Name(this);

@@ -1,4 +1,0 @@
-﻿language Liquid
-{
-  syntax module NLiquid.Parser.Grammar start rule Contents;
-}

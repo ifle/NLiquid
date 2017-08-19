@@ -1,5 +1,5 @@
 ﻿
-namespace NLiquid.Parser
+namespace NLiquid.Parser.Syntax
 {
 	[ExplicitSpaces]
 	syntax module Grammar
@@ -59,10 +59,10 @@ namespace NLiquid.Parser
 
 		syntax FilteredExpr
 		{
-      | Expr
-    precedence Filters:
-      | Filter1 = FilteredExpr s sm "|" s sm Reference
-      | Filter2 = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
+		  | Expr
+		precedence Filters:
+		  | Filter1 = FilteredExpr s sm "|" s sm Reference
+		  | Filter2 = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
 		}
 	}
 }

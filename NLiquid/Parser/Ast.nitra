@@ -4,7 +4,7 @@ using Nitra.Runtime;
 using NLiquid;
 using System.IO;
 
-namespace NLiquid.Parser
+namespace NLiquid.Parser.Ast
 {
 	ast CompilationUnit
 	{
@@ -14,7 +14,7 @@ namespace NLiquid.Parser
 	abstract ast Statement : BindableAst
 	{
 		| Plain  { }
-    | Output { Expr : Expr; }
+		| Output { Expr : Expr; }
 	}
 
   declaration Assignment : Statement

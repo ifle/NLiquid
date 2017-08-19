@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Nitra;
-using NLiquid.Parser;
+using NLiquid.Parser.Syntax;
 using NUnit.Framework;
 
 namespace NLiquid.Tests
