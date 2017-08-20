@@ -14,21 +14,39 @@ namespace NLiquid.Parser.Ast
 	abstract ast Statement : BindableAst
 	{
 		| Plain  { }
+		| Comment { }
 		| Output { Expr : Expr; }
+		| If 
+		 { 	
+			Condition : Expr;
+			Body      : Statement*; 
+			ElseIf    : ElseIf*;
+			Else      : Else?;
+		 }		
 	}
 
-  declaration Assignment : Statement
-  {
-    Initializer : Expr;
-  }
+	ast ElseIf 
+	{  
+		Condition : Expr; 
+		Body : Statement*;  
+	}
+	ast Else  
+	{ 
+		Body: Statement*; 
+	}	
+
+	declaration Assignment : Statement
+	{
+		Initializer : Expr;
+	}
 
 	abstract ast Expr : BindableAst
 	{
-    | SStr         { Value : string; }
-    | DStr         { Value : string; }
-    | Ref          { Reference : Reference; }
-    | MemberAccess { Qualifier : Expr; Reference : Reference; }
-    | Error        { Error(context, "Expected: Expr '}}'"); }
-    | Call         { Func : Expr; Args : Expr*; }
+		| SStr         { Value : string; }
+		| DStr         { Value : string; }
+		| Ref          { Reference : Reference; }
+		| MemberAccess { Qualifier : Expr; Reference : Reference; }
+		| Error        { Error(context, "Expected: Expr '}}'"); }
+		| Call         { Func : Expr; Args : Expr*; }
 	}
 }

@@ -4,61 +4,70 @@ using NLiquid.Parser.Syntax;
 using NLiquid.Parser.Ast;
 namespace NLiquid.Parser.Mapping
 {
-  map syntax Grammar.Reference -> Reference = Reference(this);
-  map syntax Grammar.Name      -> Name      = Name(this);
+	map syntax Grammar.Reference -> Reference = Reference(this);
+	map syntax Grammar.Name      -> Name      = Name(this);
 
 	map syntax Grammar.Contents -> CompilationUnit
 	{
-		Contents -> Statements;
-	}
+		Statements -> Statements;
+	}	
 
-	map syntax Grammar.Content.Atom -> Statement
-  {
-    Atom // forwarding value through
-  }
-
-	map syntax Grammar.Content -> Statement
+	map syntax Grammar.Statement -> Statement
 	{
-		| Plain -> Plain {}
+		| Plain  -> Plain {}
+		| Comment -> Comment {}
+		| Output -> Output { OutputExpr -> Expr; }
+		| If -> If
+		  { 	
+			Expr		-> Condition;
+			TrueBranch	-> Body;
+			ElseIf		-> ElseIf; 			
+			Else		-> Else; 			
+			
+		  }		
+		| Assignment -> Assignment			
+		  { 
+			Name -> Name; FilteredExpr -> Initializer; 
+		  }			
+	}
+  
+	map syntax Grammar.ElseIf -> ElseIf 
+	{
+		Expr -> Condition;
+		ElseTrueBranch -> Body;
 	}
 
-  map syntax Grammar.Atom -> Statement
-  {
-    | Tag    -> Plain  { } // temporary use Plain!
-    | Output -> Output { OutputExpr -> Expr; }
-  }
+	map syntax Grammar.Else -> Else
+	{		
+		ElseBranch -> Body;
+	}
 
-  map syntax Grammar.Atom.Assignment -> Statement
-  {
-    Assignment { Name -> Name; FilteredExpr -> Initializer; }
-  }
+	map syntax Grammar.OutputExpr.FilteredExpr -> Expr
+	{
+		FilteredExpr // forwarding value through
+	}
 
-  map syntax Grammar.OutputExpr.FilteredExpr -> Expr
-  {
-    FilteredExpr // forwarding value through
-  }
+	map syntax Grammar.OutputExpr -> Expr
+	{
+		| Error -> Error { }
+	}
 
-  map syntax Grammar.OutputExpr -> Expr
-  {
-    | Error -> Error { }
-  }
+	map syntax Grammar.FilteredExpr.Expr -> Expr
+	{
+		Expr // forwarding value through
+	}
 
-  map syntax Grammar.FilteredExpr.Expr -> Expr
-  {
-    Expr // forwarding value through
-  }
+	map syntax Grammar.Expr -> Expr
+	{
+		| SStr         -> SStr { Value = ParsedValue(Value, GetText(Value)); }
+		| DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
+		| Reference    -> Ref  { Reference -> Reference; }
+		| MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
+	}
 
-  map syntax Grammar.Expr -> Expr
-  {
-    | SStr         -> SStr { Value = ParsedValue(Value, GetText(Value)); }
-    | DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
-    | Reference    -> Ref  { Reference -> Reference; }
-    | MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
-  }
-
-  map syntax Grammar.FilteredExpr -> Expr
-  {
-    | Filter1      -> Call { FilteredExpr -> Func; [] -> Args; }
-    | Filter2      -> Call { FilteredExpr -> Func; Args.Item1 -> Args; }
-  }
+	map syntax Grammar.FilteredExpr -> Expr
+	{
+		| Filter1      -> Call { FilteredExpr -> Func; [] -> Args; }
+		| Filter2      -> Call { FilteredExpr -> Func; Args.Item1 -> Args; }
+	}
 }

@@ -19,29 +19,27 @@ namespace NLiquid.Parser.Syntax
 			| SpaceToken = Spaces;			
 		}	
 		
-		syntax Contents = Content*;
+		syntax Statements = Statement*;
 
-		syntax Content
+		syntax Statement
 		{
-			| Atom
 			| Plain = (!TagStart Any)+
 				{
-				  regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
+					regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
 				}
-		}
-
-		syntax Atom
-		{
-			| Tag
+			| Comment 	= MultiLineComment
+			| If      	= "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Statement* s sm 
+						  ElseIf=(ElseIf*) s sm
+						  Else=(Else?) s sm
+						  "{%" s sm "endif" s sm "%}"
+			
 			| Output      = "{{" s sm OutputExpr s sm  "}}"
 			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
-		}
-		
-		syntax Tag
-		{
-			| Comment = MultiLineComment;
-		}
-		
+		}		
+						 									 
+		syntax ElseIf	= "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Statement*;
+		syntax Else		= "{%" s sm "else"  s sm            "%}" s sm ElseBranch=Statement*;
+
 		[SpanClass(MultilineComment)] 
 		syntax MultiLineComment  = Start s sm "comment" s sm End s sm Body=(!"{%" Any)* s sm Start s sm "endcomment" s sm End 
 		{
