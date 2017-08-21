@@ -8,23 +8,32 @@ namespace NLiquid.Parser.Ast
 {
 	ast CompilationUnit
 	{
+		in MemberTable : TableScope;
 		Statements : Statement*;
-	}
-
+	}	
+  
 	abstract ast Statement : BindableAst
 	{
+		in CurrentTable : TableScope;
+		
 		| Plain  { }
 		| Comment { }
 		| Output { Expr : Expr; }
 		| If 
 		 { 	
+			Body.CurrentTable = CurrentTable;
+			ElseIfs.CurrentTable = CurrentTable;
+			Else.CurrentTable = CurrentTable;
+			
 			Condition : Expr;
 			Body      : Statement*; 
-			ElseIfs    : ElseIf*;
+			ElseIfs   : ElseIf*;
 			Else      : Else?;
 		 }
 		| Unless 
 		 { 	
+			Body.CurrentTable = CurrentTable;
+			
 			Condition : Expr;
 			Body      : Statement*; 			
 		 }
@@ -32,11 +41,16 @@ namespace NLiquid.Parser.Ast
 
 	ast ElseIf 
 	{  
+		in CurrentTable : TableScope;
+		Body.CurrentTable = CurrentTable;
+		
 		Condition : Expr; 
 		Body : Statement*;  
 	}
 	ast Else  
 	{ 
+		in CurrentTable : TableScope;
+		
 		Body: Statement*; 
 	}	
 
