@@ -63,6 +63,11 @@ namespace NLiquid.Parser.Mapping
 		| DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
 		| Reference    -> Ref  { Reference -> Reference; }
 		| MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
+		| Or           { Expr1 -> Expr1; Expr2 -> Expr2; }
+		| And          { Expr1 -> Expr1; Expr2 -> Expr2; }
+		| Contains     { Expr1 -> Expr1; Expr2 -> Expr2; }
+		| Equal        { Expr1 -> Expr1; Expr2 -> Expr2; }
+		| NotEqual     { Expr1 -> Expr1; Expr2 -> Expr2; }
 	}
 
 	map syntax Grammar.FilteredExpr -> Expr

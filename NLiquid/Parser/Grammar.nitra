@@ -1,19 +1,22 @@
 ﻿
 namespace NLiquid.Parser.Syntax
 {
-	[ExplicitSpaces]
+	
+	[ExplicitSpaces]	
 	syntax module Grammar
 	{
 		using Nitra.Core;
 		using Nitra.CStyleComments;
 		using Nitra.Identifiers;
+		
+		literal OpenBrace           = "{{", "{%";
+		literal CloseBrace          = "}}", "%}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
 		token Reference		= IdentifierBody;
 		token Name			= IdentifierBody;
 		literal Op			= "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
-		literal OpenTag           = "{%";
-		literal CloseTag          = "%}";
+		
 		extend token IgnoreToken
 		{
 			| SpaceToken = Spaces;			
@@ -63,9 +66,16 @@ namespace NLiquid.Parser.Syntax
 			| Reference
 			| SStr = "'" Value=(!"'" Any)* "'"
 			| DStr = '"' Value=(!'"' Any)* '"'
-
-			// сюда над добавить остальные выражения.
-
+			
+		precedence Or:
+			| Or		= Expr s sm "or" s sm Expr  
+		precedence And:
+			| And		= Expr s sm "and" s sm Expr
+		precedence Contains:
+			| Contains	= Expr s sm "contains" s sm Expr
+		precedence Equal:
+			| Equal		= Expr s sm "==" s sm Expr
+			| NotEqual	= Expr s sm "!=" s sm Expr
 		precedence Primary:
 			| MemberAccess =  Expr s "." s Reference
 		}

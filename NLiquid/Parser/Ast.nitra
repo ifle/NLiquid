@@ -38,8 +38,27 @@ namespace NLiquid.Parser.Ast
 	declaration Assignment : Statement
 	{
 		Initializer : Expr;
+	}	
+	abstract ast Binary : Expr
+	{ 
+		Expr1 : Expr;
+		Expr2 : Expr; 
 	}
+	
+	abstract ast EqualExpr : Binary
+	{
+		
+	}
+	
+	abstract ast OrAndExpr : Binary
+	{
 
+	}	
+	abstract ast ContainsExpr : Binary
+	{
+
+	}
+	
 	abstract ast Expr : BindableAst
 	{
 		| SStr         { Value : string; }
@@ -48,5 +67,10 @@ namespace NLiquid.Parser.Ast
 		| MemberAccess { Qualifier : Expr; Reference : Reference; }
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call         { Func : Expr; Args : Expr*; }
+		| Or           : OrAndExpr {}
+		| And          : OrAndExpr {}
+		| Contains     : ContainsExpr {}
+		| Equal        : EqualExpr{ }
+		| NotEqual     : EqualExpr{ }
 	}
 }
