@@ -7,12 +7,12 @@ namespace NLiquid.Parser.Mapping
 	map syntax Grammar.Reference -> Reference = Reference(this);
 	map syntax Grammar.Name      -> Name      = Name(this);
 
-	map syntax Grammar.Contents -> CompilationUnit
+	map syntax Grammar.Blocks -> CompilationUnit
 	{
-		Statements -> Statements;
+		Blocks -> Statements;
 	}	
 
-	map syntax Grammar.Statement -> Statement
+	map syntax Grammar.Block -> Statement
 	{
 		| Plain  -> Plain {}
 		| Comment -> Comment {}
@@ -21,7 +21,7 @@ namespace NLiquid.Parser.Mapping
 		  { 	
 			Expr		-> Condition;
 			TrueBranch	-> Body;
-			ElseIf		-> ElseIf; 			
+			ElseIf		-> ElseIfs;
 			Else		-> Else; 			
 			
 		  }		

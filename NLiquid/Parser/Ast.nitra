@@ -20,7 +20,7 @@ namespace NLiquid.Parser.Ast
 		 { 	
 			Condition : Expr;
 			Body      : Statement*; 
-			ElseIf    : ElseIf*;
+			ElseIfs    : ElseIf*;
 			Else      : Else?;
 		 }		
 	}
