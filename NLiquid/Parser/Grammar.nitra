@@ -30,14 +30,14 @@ namespace NLiquid.Parser.Syntax
 				{
 					regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
 				}
-			| Comment 	= MultiLineComment
-			| If      	= "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Block* s sm 
-						  ElseIf=(ElseIf*) s sm
-						  Else=(Else?) s sm
-						  "{%" s sm "endif" s sm "%}"
-			
-			| Output      = "{{" s sm OutputExpr s sm  "}}"
-			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
+			| Comment 		= MultiLineComment
+			| If      		= "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Block* s sm 
+							  ElseIf=(ElseIf*) s sm
+							  Else=(Else?) s sm
+							"{%" s sm "endif" s sm "%}"
+			| Unless      	= "{%" s sm "unless" s sm  Expr s sm "%}" s sm Body=Block* s sm "{%" s sm "endunless" s sm "%}"
+			| Output      	= "{{" s sm OutputExpr s sm  "}}"
+			| Assignment  	= "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
 		}		
 						 									 
 		syntax ElseIf	= "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Block*;

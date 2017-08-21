@@ -22,7 +22,12 @@ namespace NLiquid.Parser.Ast
 			Body      : Statement*; 
 			ElseIfs    : ElseIf*;
 			Else      : Else?;
-		 }		
+		 }
+		| Unless 
+		 { 	
+			Condition : Expr;
+			Body      : Statement*; 			
+		 }
 	}
 
 	ast ElseIf 

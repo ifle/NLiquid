@@ -25,6 +25,11 @@ namespace NLiquid.Parser.Mapping
 			Else		-> Else; 			
 			
 		  }		
+		| Unless -> Unless
+		  { 	
+			Expr	-> Condition;
+			Body	-> Body;
+		  }		
 		| Assignment -> Assignment			
 		  { 
 			Name -> Name; FilteredExpr -> Initializer; 
