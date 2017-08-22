@@ -29,18 +29,16 @@ namespace NLiquid
     {
         def context = DecomposeData(data);
         context.CancellationToken = cancellationToken;
-        
+
         when (cancellationToken.IsCancellationRequested)
         return;
-        
+
         def scope = TableScope("Variables");
 
         foreach (file in files)
-            when (file.Ast is CompilationUnit as cu) 
-            {
-                cu.MemberTable = scope;
-                cu.Statements.CurrentTable = scope;
-            }
+            when (file.Ast is CompilationUnit as cu)
+              cu.Scope = scope;
+
         def evalHost = ProjectEvalPropertiesHost(files);
         evalHost.EvalProperties(context, "Pass0", 0);
         evalHost.EvalProperties(context, "Pass1", 1);

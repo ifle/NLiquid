@@ -1,27 +1,26 @@
 ﻿
 namespace NLiquid.Parser.Syntax
 {
-	
-	[ExplicitSpaces]	
+	[ExplicitSpaces]
 	syntax module Grammar
 	{
 		using Nitra.Core;
 		using Nitra.CStyleComments;
 		using Nitra.Identifiers;
-		
+
 		literal OpenBrace           = "{{", "{%";
 		literal CloseBrace          = "}}", "%}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
-		token Reference		= IdentifierBody;
-		token Name			= IdentifierBody;
-		literal Op			= "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
-		
+		token Reference = IdentifierBody;
+		token Name      = IdentifierBody;
+		literal Op      = "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
+
 		extend token IgnoreToken
 		{
-			| SpaceToken = Spaces;			
-		}	
-		
+			| SpaceToken = Spaces;
+		}
+
 		syntax Blocks = Block*;
 
 		syntax Block
@@ -30,21 +29,21 @@ namespace NLiquid.Parser.Syntax
 				{
 					regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
 				}
-			| Comment 		= MultiLineComment
-			| If      		= "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Block* s sm 
-							  ElseIf=(ElseIf*) s sm
-							  Else=(Else?) s sm
-							"{%" s sm "endif" s sm "%}"
-			| Unless      	= "{%" s sm "unless" s sm  Expr s sm "%}" s sm Body=Block* s sm "{%" s sm "endunless" s sm "%}"
-			| Output      	= "{{" s sm OutputExpr s sm  "}}"
-			| Assignment  	= "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
-		}		
-						 									 
-		syntax ElseIf	= "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Block*;
-		syntax Else		= "{%" s sm "else"  s sm            "%}" s sm ElseBranch=Block*;
+			| Comment = MultiLineComment
+			| If      = "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Block* s sm
+			  ElseIf=(ElseIf*) s sm
+			  Else=(Else?) s sm
+			  "{%" s sm "endif" s sm "%}"
+			| Unless      = "{%" s sm "unless" s sm  Expr s sm "%}" s sm Body=Block* s sm "{%" s sm "endunless" s sm "%}"
+			| Output      = "{{" s sm OutputExpr s sm  "}}"
+			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
+		}
 
-		[SpanClass(MultilineComment)] 
-		syntax MultiLineComment  = Start s sm "comment" s sm End s sm Body=(!"{%" Any)* s sm Start s sm "endcomment" s sm End 
+		syntax ElseIf = "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Block*;
+		syntax Else   = "{%" s sm "else"  s sm            "%}" s sm ElseBranch=Block*;
+
+		[SpanClass(MultilineComment)]
+		syntax MultiLineComment  = Start s sm "comment" s sm End s sm Body=(!"{%" Any)* s sm Start s sm "endcomment" s sm End
 		{
 			[SpanClass(OpenBrace)]
 			regex Start = "{%";
@@ -53,7 +52,7 @@ namespace NLiquid.Parser.Syntax
 			regex End = "%}";
 		}
 
-		// Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае, 
+		// Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае,
 		// если пользователь накосячит с выражением.
 		syntax OutputExpr
 		{
@@ -66,16 +65,16 @@ namespace NLiquid.Parser.Syntax
 			| Reference
 			| SStr = "'" Value=(!"'" Any)* "'"
 			| DStr = '"' Value=(!'"' Any)* '"'
-			
+
 		precedence Or:
-			| Or		= Expr s sm "or" s sm Expr  
+			| Or           = Expr s sm "or" s sm Expr
 		precedence And:
-			| And		= Expr s sm "and" s sm Expr
+			| And          = Expr s sm "and" s sm Expr
 		precedence Contains:
-			| Contains	= Expr s sm "contains" s sm Expr
+			| Contains     = Expr s sm "contains" s sm Expr
 		precedence Equal:
-			| Equal		= Expr s sm "==" s sm Expr
-			| NotEqual	= Expr s sm "!=" s sm Expr
+			| Equal        = Expr s sm "==" s sm Expr
+			| NotEqual     = Expr s sm "!=" s sm Expr
 		precedence Primary:
 			| MemberAccess =  Expr s "." s Reference
 		}

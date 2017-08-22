@@ -6,120 +6,137 @@ using System.IO;
 
 namespace NLiquid.Parser.Ast
 {
-	ast CompilationUnit
+	ast CompilationUnit : BindableAst, LocalVariableScope
 	{
-		in MemberTable : TableScope;
-		Statements.CurrentTable = MemberTable;		
+		Statements.CurrentTable = LocalVariables;
+		Statements.Scope = Scope.HideWith(LocalVariables);
+
 		Statements : Statement*;
-	}		
-	
+	}
+
+	abstract ast LocalVariableScope
+	{
+		out LocalVariables : TableScope = TableScope("Local variables");
+	}
+
 	abstract ast Statement : BindableAst
-	{		
+	{
 		in CurrentTable : TableScope;
-		Scope = TableScope("locals");
 
 		| Plain  { }
 		| Comment { }
-		| Output 
-		 { 
+		| Output
+		 {
 			Expr.Scope = Scope;
-			Expr : Expr; 
-		}
-		| If 
-		 { 	
-			Condition.Scope			= Scope;
-			Body.CurrentTable 		= Scope :> TableScope;
-			ElseIfs.CurrentTable 	= Scope :> TableScope;
-			Else.CurrentTable 		= Scope :> TableScope;			
-			
+
+			Expr : Expr;
+		 }
+		| If : LocalVariableScope
+		 {
+			CurrentTable         = LocalVariables;
+			// протаскиваем текущую таблицу имен во вложенные блоки
+			Body.CurrentTable    = CurrentTable;
+			ElseIfs.CurrentTable = CurrentTable;
+			Else.CurrentTable    = CurrentTable;
+			Body.Scope           = Scope.HideWith(LocalVariables); // скрываем скопом локальных переменных скопы сформированные выше.
+			Condition.Scope      = Scope;
+			ElseIfs.Scope        = Scope;
+			Else.Scope           = Scope;
+
 			Condition : Expr;
-			Body      : Statement*; 
+			Body      : Statement*;
 			ElseIfs   : ElseIf*;
 			Else      : Else?;
 		 }
-		| Unless 
-		 { 	
-			Body.CurrentTable = Scope :> TableScope;
-			Condition.Scope	= Scope;
+		| Unless : LocalVariableScope
+		 {
+			CurrentTable    = LocalVariables;
+			Body.CurrentTable = CurrentTable;
+			Body.Scope      = Scope.HideWith(LocalVariables);
+			Condition.Scope = Scope;
+
 			Condition : Expr;
-			Body      : Statement*; 			
+			Body      : Statement*;
 		 }
 	}
 
-	ast ElseIf 
-	{  
-		in CurrentTable : TableScope;
-		in Scope : TableScope;
+	ast ElseIf : Statement, LocalVariableScope
+	{
+		CurrentTable      = LocalVariables;
+		Body.CurrentTable = CurrentTable;
+		Body.Scope        = Scope.HideWith(LocalVariables);
+		Condition.Scope   = Scope;
 
-		Scope = TableScope("locals");
-		Body.CurrentTable = Scope;
-		Condition.Scope	= CurrentTable;
-		Condition : Expr; 
-		Body : Statement*;  
+		Condition : Expr;
+		Body      : Statement*;
 	}
-	ast Else  
-	{ 
-		in CurrentTable : TableScope;
-		in Scope : TableScope;
-		Scope = TableScope("locals");
 
-		Body.CurrentTable = Scope;
-		Body: Statement*; 
-	}	
+	ast Else : Statement, LocalVariableScope
+	{
+		CurrentTable      = LocalVariables;
+		Body.CurrentTable = CurrentTable;
+		Body.Scope        = Scope.HideWith(LocalVariables);
+
+		Body: Statement*;
+	}
 
 	declaration Assignment : Statement
 	{
-		ContainingTable = CurrentTable;
-		Scope = CurrentTable;
+		ContainingTable   = CurrentTable; // говорим в какой таблице определять переменную
 		Initializer.Scope = Scope;
+
 		Initializer : Expr;
-	}	
+	}
+
 	abstract ast Binary : Expr
-	{ 
+	{
 		Expr1.Scope = Scope;
 		Expr2.Scope = Scope;
-		
+
 		Expr1 : Expr;
-		Expr2 : Expr; 
+		Expr2 : Expr;
 	}
-	
+
 	abstract ast EqualExpr : Binary
 	{
-		
+
 	}
-	
+
 	abstract ast OrAndExpr : Binary
 	{
 
-	}	
+	}
 	abstract ast ContainsExpr : Binary
 	{
 
 	}
-	
+
 	abstract ast Expr : BindableAst
 	{
 		| SStr         { Value : string; }
 		| DStr         { Value : string; }
-		| Ref          
-		 { 
+		| Ref
+		 {
 			Reference.Scope = Scope;
-			Reference : Reference; 
+
+			Reference : Reference;
 		 }
-		| MemberAccess 
-		 { 
+		| MemberAccess
+		 {
 			Qualifier.Scope = Scope;
 			Reference.Scope = Scope;
-			Qualifier : Expr; 
-			Reference : Reference; 
+
+			Qualifier : Expr;
+			Reference : Reference;
 		 }
 		| Error        { Error(context, "Expected: Expr '}}'"); }
-		| Call         
-		 { 
+		| Call
+		 {
 			Func.Scope = Scope;
 			Args.Scope = Scope;
-			Func : Expr; 
-			Args : Expr*; 
+
+			Func : Expr;
+			Args : Expr*;
 		 }
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
