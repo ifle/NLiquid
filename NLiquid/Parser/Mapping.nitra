@@ -10,7 +10,7 @@ namespace NLiquid.Parser.Mapping
 	map syntax Grammar.Blocks -> CompilationUnit
 	{
 		Blocks -> Statements;
-	}	
+	}
 
 	map syntax Grammar.Block -> Statement
 	{
@@ -18,32 +18,32 @@ namespace NLiquid.Parser.Mapping
 		| Comment -> Comment {}
 		| Output -> Output { OutputExpr -> Expr; }
 		| If -> If
-		  { 	
-			Expr		-> Condition;
-			TrueBranch	-> Body;
-			ElseIf		-> ElseIfs;
-			Else		-> Else; 			
-			
-		  }		
+		  {
+			Expr       -> Condition;
+			TrueBranch -> Body;
+			ElseIf    -> ElseIfs;
+			Else      -> Else;
+
+		  }
 		| Unless -> Unless
-		  { 	
+		  {
 			Expr	-> Condition;
 			Body	-> Body;
-		  }		
-		| Assignment -> Assignment			
-		  { 
-			Name -> Name; FilteredExpr -> Initializer; 
-		  }			
+		  }
+		| Assignment -> Assignment
+		  {
+			Name -> Name; FilteredExpr -> Initializer;
+		  }
 	}
-  
-	map syntax Grammar.ElseIf -> ElseIf 
+
+	map syntax Grammar.ElseIf -> ElseIf
 	{
 		Expr -> Condition;
 		ElseTrueBranch -> Body;
 	}
 
 	map syntax Grammar.Else -> Else
-	{		
+	{
 		ElseBranch -> Body;
 	}
 
@@ -64,6 +64,8 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Expr -> Expr
 	{
+		| True         -> True  { }
+		| False        -> False { }
 		| SStr         -> SStr { Value = ParsedValue(Value, GetText(Value)); }
 		| DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
 		| Reference    -> Ref  { Reference -> Reference; }

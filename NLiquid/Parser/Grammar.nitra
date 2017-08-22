@@ -65,6 +65,8 @@ namespace NLiquid.Parser.Syntax
 
 		syntax Expr
 		{
+			| "true"
+			| "false"
 			| Reference
 			| SStr = "'" Value=(!"'" Any)* "'"
 			| DStr = '"' Value=(!'"' Any)* '"'

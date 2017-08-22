@@ -111,6 +111,8 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast Expr : BindableAst
 	{
+		| True
+		| False
 		| SStr         { Value : string; }
 		| DStr         { Value : string; }
 		| Ref
