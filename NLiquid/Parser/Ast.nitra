@@ -50,10 +50,10 @@ namespace NLiquid.Parser.Ast
 		 }
 		| Unless : LocalVariableScope
 		 {
-			CurrentTable    = LocalVariables;
+			CurrentTable      = LocalVariables;
 			Body.CurrentTable = CurrentTable;
-			Body.Scope      = Scope.HideWith(LocalVariables);
-			Condition.Scope = Scope;
+			Body.Scope        = Scope.HideWith(LocalVariables);
+			Condition.Scope   = Scope;
 
 			Condition : Expr;
 			Body      : Statement*;
@@ -99,16 +99,14 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast EqualExpr : Binary
 	{
-
 	}
 
 	abstract ast OrAndExpr : Binary
 	{
-
 	}
+
 	abstract ast ContainsExpr : Binary
 	{
-
 	}
 
 	abstract ast Expr : BindableAst
