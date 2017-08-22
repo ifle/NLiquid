@@ -9,21 +9,28 @@ namespace NLiquid.Parser.Ast
 	ast CompilationUnit
 	{
 		in MemberTable : TableScope;
+		Statements.CurrentTable = MemberTable;		
 		Statements : Statement*;
-	}	
-  
+	}		
+	
 	abstract ast Statement : BindableAst
-	{
+	{		
 		in CurrentTable : TableScope;
-		
+		Scope = TableScope("locals");
+
 		| Plain  { }
 		| Comment { }
-		| Output { Expr : Expr; }
+		| Output 
+		 { 
+			Expr.Scope = Scope;
+			Expr : Expr; 
+		}
 		| If 
 		 { 	
-			Body.CurrentTable = CurrentTable;
-			ElseIfs.CurrentTable = CurrentTable;
-			Else.CurrentTable = CurrentTable;
+			Condition.Scope			= Scope;
+			Body.CurrentTable 		= Scope :> TableScope;
+			ElseIfs.CurrentTable 	= Scope :> TableScope;
+			Else.CurrentTable 		= Scope :> TableScope;			
 			
 			Condition : Expr;
 			Body      : Statement*; 
@@ -32,8 +39,8 @@ namespace NLiquid.Parser.Ast
 		 }
 		| Unless 
 		 { 	
-			Body.CurrentTable = CurrentTable;
-			
+			Body.CurrentTable = Scope :> TableScope;
+			Condition.Scope	= Scope;
 			Condition : Expr;
 			Body      : Statement*; 			
 		 }
@@ -42,24 +49,36 @@ namespace NLiquid.Parser.Ast
 	ast ElseIf 
 	{  
 		in CurrentTable : TableScope;
-		Body.CurrentTable = CurrentTable;
-		
+		in Scope : TableScope;
+
+		Scope = TableScope("locals");
+		Body.CurrentTable = Scope;
+		Condition.Scope	= CurrentTable;
 		Condition : Expr; 
 		Body : Statement*;  
 	}
 	ast Else  
 	{ 
 		in CurrentTable : TableScope;
-		
+		in Scope : TableScope;
+		Scope = TableScope("locals");
+
+		Body.CurrentTable = Scope;
 		Body: Statement*; 
 	}	
 
 	declaration Assignment : Statement
 	{
+		ContainingTable = CurrentTable;
+		Scope = CurrentTable;
+		Initializer.Scope = Scope;
 		Initializer : Expr;
 	}	
 	abstract ast Binary : Expr
 	{ 
+		Expr1.Scope = Scope;
+		Expr2.Scope = Scope;
+		
 		Expr1 : Expr;
 		Expr2 : Expr; 
 	}
@@ -82,10 +101,26 @@ namespace NLiquid.Parser.Ast
 	{
 		| SStr         { Value : string; }
 		| DStr         { Value : string; }
-		| Ref          { Reference : Reference; }
-		| MemberAccess { Qualifier : Expr; Reference : Reference; }
+		| Ref          
+		 { 
+			Reference.Scope = Scope;
+			Reference : Reference; 
+		 }
+		| MemberAccess 
+		 { 
+			Qualifier.Scope = Scope;
+			Reference.Scope = Scope;
+			Qualifier : Expr; 
+			Reference : Reference; 
+		 }
 		| Error        { Error(context, "Expected: Expr '}}'"); }
-		| Call         { Func : Expr; Args : Expr*; }
+		| Call         
+		 { 
+			Func.Scope = Scope;
+			Args.Scope = Scope;
+			Func : Expr; 
+			Args : Expr*; 
+		 }
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}
