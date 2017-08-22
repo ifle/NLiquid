@@ -12,8 +12,11 @@ namespace NLiquid.Parser.Syntax
 		literal CloseBrace          = "}}", "%}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
-		token Reference = IdentifierBody;
-		token Name      = IdentifierBody;
+
+		regex Keyword = "true" | "false";
+		token Reference = !Keyword IdentifierBody;
+		token Name      = !Keyword IdentifierBody;
+
 		literal Op      = "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
 
 		extend token IgnoreToken
