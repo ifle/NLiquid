@@ -49,7 +49,7 @@ namespace NLiquid.Parser.Ast
 			Else      : Else?;
 		 }
 		| Unless : LocalVariableScope
-		 {
+		{
 			CurrentTable      = LocalVariables;
 			Body.CurrentTable = CurrentTable;
 			Body.Scope        = Scope.HideWith(LocalVariables);
@@ -57,7 +57,7 @@ namespace NLiquid.Parser.Ast
 
 			Condition : Expr;
 			Body      : Statement*;
-		 }
+		}
 	}
 
 	ast ElseIf : Statement, LocalVariableScope
@@ -81,19 +81,18 @@ namespace NLiquid.Parser.Ast
 	}
 
 	declaration Assignment : Statement
-	{		
+	{
 		symbol
 		{
 			in Type: TypeSymbol;
 			Kind = "assigment";
 		}
-		
+
 		ContainingTable   = CurrentTable; // говорим в какой таблице определять переменную
 		Initializer.Scope = Scope;
 		Symbol.Type       = Initializer.Type;
 
 		Initializer : Expr;
-		
 	}
 
 	abstract ast Binary : Expr
@@ -106,10 +105,10 @@ namespace NLiquid.Parser.Ast
 	}
 
 	abstract ast SameTypesExpr : Binary
-  	{
+	{
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, Expr2.Type))
 			Expr2.Error(context, $"$(self.Expr2.Type) is not compatible with $(self.Expr1.Type).");
-  	}
+	}
 
 	abstract ast EqualExpr : SameTypesExpr
 	{
@@ -118,46 +117,45 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast OrAndExpr : SameTypesExpr
 	{
-		Type = context.GetBooleanSymbol();    
+		Type = context.GetBooleanSymbol();
 	}
 
 	abstract ast ContainsExpr : SameTypesExpr
 	{
 		Type = context.GetBooleanSymbol();
-    
+
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetStringSymbol()))
 			Expr1.Error(context, $"Expected string expression but found $(self.Expr1.Type).");
 	}
 
 	abstract ast Expr : BindableAst
 	{
-		in Type: TypeSymbol = context.GetNilSymbol();
-    	in ExpectedType: TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();    	
+		in Type         : TypeSymbol = context.GetNilSymbol();
+		in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
 
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
 			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
 
-
 		| True
-		  {
+		{
 			Type = context.GetBooleanSymbol();
-        	Value : bool; 
-		  }
+			Value : bool;
+		}
 		| False
-		  {
+		{
 			Type = context.GetBooleanSymbol();
-        	Value : bool; 
-		  }
-		| SStr         
-		  { 
+			Value : bool;
+		}
+		| SStr
+		{
 			Type = context.GetStringSymbol();
 			Value : string;
-		 }
+		}
 		| DStr
-		  { 
+		{
 			Type = context.GetStringSymbol();
 			Value : string;
-		 }
+		}
 		| Ref
 		 {
 			out Ref: Ref[AssignmentSymbol] = Reference.Ref.Resolve();

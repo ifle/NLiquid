@@ -29,24 +29,24 @@ namespace NLiquid
     static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
     static NoSpan : NSpan              = NSpan(0);
 
-     public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
+    public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
     {
       IgnoreParams();
 
       def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
       {
-        def name = Name(NoLocation, name);
+        def name   = Name(NoLocation, name);
         def symbol = ExternalDeclaration.[Type](name).DefineSymbol();
         symbol
       }
-      def nilSymbol  = defineSymbol.[NilSymbol]("nil");
-      def numberSymbol   = defineSymbol.[NumberSymbol]("number");
-      def boolSymbol = defineSymbol.[BooleanSymbol]("bool");
-      def stringSymbol  = defineSymbol.[StringSymbol]("string");
-      def objectSymbol  = defineSymbol.[ObjectSymbol]("object");
-      def arraySymbol  = defineSymbol.[ArraySymbol]("array");
-      def dictionarySymbol  = defineSymbol.[DictionarySymbol]("dictionary");
-      def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol);
+      def nilSymbol        = defineSymbol.[NilSymbol]("nil");
+      def numberSymbol     = defineSymbol.[NumberSymbol]("number");
+      def boolSymbol       = defineSymbol.[BooleanSymbol]("bool");
+      def stringSymbol     = defineSymbol.[StringSymbol]("string");
+      def objectSymbol     = defineSymbol.[ObjectSymbol]("object");
+      def arraySymbol      = defineSymbol.[ArraySymbol]("array");
+      def dictionarySymbol = defineSymbol.[DictionarySymbol]("dictionary");
+      def context          = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol);
       context
     }
 
@@ -64,7 +64,7 @@ namespace NLiquid
             when (file.Ast is CompilationUnit as cu)
               cu.Scope = scope;
 
-        def evalHost = ProjectEvalPropertiesHost(files);
+        def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedSymbols);
         evalHost.EvalProperties(context, "Pass0", 0);
         evalHost.EvalProperties(context, "Pass1", 1);
     }
@@ -86,9 +86,9 @@ namespace NLiquid
       IgnoreParams();
     }
 
-    public DecomposeData(data : object) : DependentPropertyEvalContext
+    public DecomposeData(data : object) : NLiquidDependentPropertyEvalContext
     {
-      data :> DependentPropertyEvalContext
+      data :> NLiquidDependentPropertyEvalContext
     }
   }
 }

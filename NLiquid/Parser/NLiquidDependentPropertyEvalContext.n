@@ -8,15 +8,13 @@ using Nitra.Declarations;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using NLiquid.Parser.Ast;
 
 namespace NLiquid.Parser
 {
-  /// <summary>
-  /// Description of NLiquidDependentPropertyEvalContext.
-  /// </summary>
   [Record]
   public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
   {
@@ -27,5 +25,10 @@ namespace NLiquid.Parser
     public Object      : ObjectSymbol;
     public Array       : ArraySymbol;
     public Dictionary  : DictionarySymbol;
+
+    public PredefinedSymbols : ImmutableArray[DeclarationSymbol]
+    {
+      get { ImmutableArray.Create(Nil, Number, Boolean, String, Object, Array, Dictionary); }
+    }
   }
 }
