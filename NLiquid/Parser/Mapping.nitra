@@ -19,11 +19,10 @@ namespace NLiquid.Parser.Mapping
 		| Output -> Output { OutputExpr -> Expr; }
 		| If -> If
 		  {
-			Expr       -> Condition;
-			TrueBranch -> Body;
-			ElseIf    -> ElseIfs;
-			Else      -> Else;
-
+				Expr       -> Condition;
+				TrueBranch -> Body;
+				ElseIf    -> ElseIfs;
+				Else      -> Else;
 		  }
 		| Unless -> Unless
 		  {
@@ -64,8 +63,8 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Expr -> Expr
 	{
-		| True         -> True  { }
-		| False        -> False { }
+		| True         -> True  { Value = ParsedValue(NSpan(), true); }
+		| False        -> False { Value = ParsedValue(NSpan(), false); }
 		| SStr         -> SStr { Value = ParsedValue(Value, GetText(Value)); }
 		| DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
 		| Reference    -> Ref  { Reference -> Reference; }
