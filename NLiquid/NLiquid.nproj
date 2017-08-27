@@ -81,6 +81,9 @@
     <Compile Include="Context.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Parser\AstUtils.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Parser\Grammar.nitra" />
     <Compile Include="Parser\Language.nitra">
       <SubType>Code</SubType>
@@ -89,6 +92,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NLiquidValue.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\NLiquidDependentPropertyEvalContext.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ProjectSupport.n">

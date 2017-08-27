@@ -144,4 +144,27 @@ namespace NLiquid.Parser.Ast
 		| Equal        : EqualExpr{ }
 		| NotEqual     : EqualExpr{ }
 	}
+
+	abstract ast TypeReference
+	{
+		in Type: TypeSymbol;
+
+		| Nil        { Type = context.GetNilSymbol();        }
+		| Number     { Type = context.GetNumberSymbol();     }
+		| Boolean    { Type = context.GetBooleanSymbol();    }
+		| String     { Type = context.GetStringSymbol();     }
+		| Object     { Type = context.GetObjectSymbol();     }
+		| Array      { Type = context.GetArraySymbol();      }
+		| Dictionary { Type = context.GetDictionarySymbol(); }
+	}
+
+	declaration Root        : Container {}
+
+	declaration Nil         : Type {}
+ 	declaration Number      : Type {}
+  	declaration Boolean     : Type {}
+  	declaration String      : Type {}
+	declaration Object      : Type {}
+	declaration Array       : Type {}
+	declaration Dictionary  : Type {}
 }

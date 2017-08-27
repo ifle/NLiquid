@@ -1,15 +1,22 @@
-﻿using Nemerle;
+﻿using System.Threading;
+
+using Nemerle;
 using Nemerle.Collections;
-using Nemerle.Imperative;
 using Nemerle.Text;
 using Nemerle.Utility;
+using Nemerle.Extensions;
+using Nemerle.Imperative;
 
+using Nitra;
 using Nitra.Declarations;
 using Nitra.ProjectSystem;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+
+using NLiquid.Parser;
 using NLiquid.Parser.Ast;
 
 [assembly: ProjectSupport("NLiquid", typeof(NLiquid.ProjectSupport))]
@@ -18,10 +25,28 @@ namespace NLiquid
 {
   class ProjectSupport : IProjectSupport
   {
-    public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
+    static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
+    static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
+    static NoSpan : NSpan              = NSpan(0);
+
+     public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
     {
       IgnoreParams();
-      def context = DependentPropertyEvalContext();
+
+      def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
+      {
+        def name = Name(NoLocation, name);
+        def symbol = ExternalDeclaration.[Type](name).DefineSymbol();
+        symbol
+      }
+      def nilSymbol  = defineSymbol.[NilSymbol]("nil");
+      def numberSymbol   = defineSymbol.[NumberSymbol]("number");
+      def boolSymbol = defineSymbol.[BooleanSymbol]("bool");
+      def stringSymbol  = defineSymbol.[StringSymbol]("string");
+      def objectSymbol  = defineSymbol.[ObjectSymbol]("object");
+      def arraySymbol  = defineSymbol.[ArraySymbol]("array");
+      def dictionarySymbol  = defineSymbol.[DictionarySymbol]("dictionary");
+      def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol);
       context
     }
 
