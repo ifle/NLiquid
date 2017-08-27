@@ -81,11 +81,19 @@ namespace NLiquid.Parser.Ast
 	}
 
 	declaration Assignment : Statement
-	{
+	{		
+		symbol
+		{
+			in Type: TypeSymbol;
+			Kind = "assigment";
+		}
+		
 		ContainingTable   = CurrentTable; // говорим в какой таблице определять переменную
 		Initializer.Scope = Scope;
+		Symbol.Type       = Initializer.Type;
 
 		Initializer : Expr;
+		
 	}
 
 	abstract ast Binary : Expr
@@ -97,28 +105,64 @@ namespace NLiquid.Parser.Ast
 		Expr2 : Expr;
 	}
 
-	abstract ast EqualExpr : Binary
+	abstract ast SameTypesExpr : Binary
+  	{
+		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, Expr2.Type))
+			Expr2.Error(context, $"$(self.Expr2.Type) is not compatible with $(self.Expr1.Type).");
+  	}
+
+	abstract ast EqualExpr : SameTypesExpr
 	{
+		Type = context.GetBooleanSymbol();
 	}
 
-	abstract ast OrAndExpr : Binary
+	abstract ast OrAndExpr : SameTypesExpr
 	{
+		Type = context.GetBooleanSymbol();    
 	}
 
-	abstract ast ContainsExpr : Binary
+	abstract ast ContainsExpr : SameTypesExpr
 	{
+		Type = context.GetBooleanSymbol();
+    
+		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetStringSymbol()))
+			Expr1.Error(context, $"Expected string expression but found $(self.Expr1.Type).");
 	}
 
 	abstract ast Expr : BindableAst
 	{
+		in Type: TypeSymbol = context.GetNilSymbol();
+    	in ExpectedType: TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();    	
+
+		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
+			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
+
+
 		| True
+		  {
+			Type = context.GetBooleanSymbol();
+        	Value : bool; 
+		  }
 		| False
-		| SStr         { Value : string; }
-		| DStr         { Value : string; }
+		  {
+			Type = context.GetBooleanSymbol();
+        	Value : bool; 
+		  }
+		| SStr         
+		  { 
+			Type = context.GetStringSymbol();
+			Value : string;
+		 }
+		| DStr
+		  { 
+			Type = context.GetStringSymbol();
+			Value : string;
+		 }
 		| Ref
 		 {
+			out Ref: Ref[AssignmentSymbol] = Reference.Ref.Resolve();
 			Reference.Scope = Scope;
-
+			Type = Ref.Symbol.Type;
 			Reference : Reference;
 		 }
 		| MemberAccess
