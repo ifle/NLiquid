@@ -8,14 +8,22 @@ namespace NLiquid.Parser.Syntax
 		using Nitra.CStyleComments;
 		using Nitra.Identifiers;
 
-		literal OpenBrace           = "{{", "{%";
-		literal CloseBrace          = "}}", "%}";
+		[SpanClass(OpenBrace)]  regex OpenTag  = "{%";
+        [SpanClass(CloseBrace)] regex CloseTag = "%}";
+
+		[SpanClass(OpenBrace)]  regex OpenOutput  = "{{";
+        [SpanClass(CloseBrace)] regex CloseOutput = "}}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
 		regex DecimalDigit = ['0'..'9'];
 		regex Keyword      = "true" | "false";
+
 		token Reference    = !Keyword IdentifierBody;
 		token Name         = !Keyword IdentifierBody;
+		[SpanClass(String)]
+		token StringSingleQuoteLiteral = "'" Value=(!"'" Any)* "'";
+		[SpanClass(String)]
+		token StringDoubleQuoteLiteral = '"' Value=(!'"' Any)* '"';
 
 		literal Op      = "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
 
@@ -30,34 +38,25 @@ namespace NLiquid.Parser.Syntax
 		{
 			| Plain = (!TagStart Any)+
 				{
-					regex TagStart = "{{" | "{%"; // | ну и так далее, если в грамматике еще что-то есть;
+					regex TagStart = "{{" | "{%";
 				}
 			| Comment = MultiLineComment
-			| If      = "{%" s sm "if" s sm  Expr s sm "%}" s sm TrueBranch=Block* s sm
+			| If      = OpenTag s sm "if" s sm  Expr s sm CloseTag s sm TrueBranch=Block* s sm
 			  ElseIf=(ElseIf*) s sm
 			  Else=(Else?) s sm
-			  "{%" s sm "endif" s sm "%}"
-			| Unless      = "{%" s sm "unless" s sm  Expr s sm "%}" s sm Body=Block* s sm "{%" s sm "endunless" s sm "%}"
-			| Output      = "{{" s sm OutputExpr s sm  "}}"
-			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
-			| Capture     = "{%" s sm "capture" s sm  Name s sm "%}" s sm Body=Block* s sm "{%" s sm "endcapture" s sm "%}"
+			  CloseTag s sm "endif" s sm CloseTag
+			| Unless      = OpenTag s sm "unless" s sm  Expr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endunless" s sm CloseTag
+			| Output      = OpenOutput s sm OutputExpr s sm  CloseOutput
+			| Assignment  = OpenTag s sm "assign" s sm Name s sm "=" s sm FilteredExpr s CloseTag
+			| Capture     = OpenTag s sm "capture" s sm  Name s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endcapture" s sm CloseTag
 		}
 
-		syntax ElseIf = "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Block*;
-		syntax Else   = "{%" s sm "else"  s sm            "%}" s sm ElseBranch=Block*;
+		syntax ElseIf = OpenTag s sm "elsif" s sm  Expr s sm CloseTag s sm ElseTrueBranch=Block*;
+		syntax Else   = OpenTag s sm "else"  s sm            CloseTag s sm ElseBranch=Block*;
 
 		[SpanClass(MultilineComment)]
-		syntax MultiLineComment  = Start s sm "comment" s sm End s sm Body=(!"{%" Any)* s sm Start s sm "endcomment" s sm End
-		{
-			[SpanClass(OpenBrace)]
-			regex Start = "{%";
+		syntax MultiLineComment  = OpenTag s sm "comment" s sm CloseTag s sm Body=(!OpenTag Any)* s sm OpenTag s sm "endcomment" s sm CloseTag;
 
-			[SpanClass(CloseBrace)]
-			regex End = "%}";
-		}
-
-		// Следующее правило можно выбросить. Оно нужно для более качественного детектирования ошибок в случае,
-		// если пользователь накосячит с выражением.
 		syntax OutputExpr
 		{
 			| FilteredExpr
@@ -67,15 +66,15 @@ namespace NLiquid.Parser.Syntax
 		syntax Expr
 		{
 			| "true"
-			| "false"			
-			| [SpanClass(Number)] 
+			| "false"
+			| [SpanClass(Number)]
 			  Number = Digits
 			  {
 				regex Digits = ("+" | "-")? DecimalDigit+ ("." DecimalDigit+)?;
 			  }
 			| Reference
-			| SStr = "'" Value=(!"'" Any)* "'"
-			| DStr = '"' Value=(!'"' Any)* '"'
+			| [SpanClass(String)] SStr = "'" Value=(!"'" Any)* "'"
+			| [SpanClass(String)] DStr = '"' Value=(!'"' Any)* '"'
 
 		precedence Or:
 			| Or           = Expr s sm "or" s sm Expr
