@@ -1,0 +1,4 @@
+{% assign my_variable = "test" %}
+{% if my_variable != true %}
+  This statement is valid.
+{% endif %}
