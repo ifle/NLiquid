@@ -12,10 +12,10 @@ namespace NLiquid.Parser.Syntax
 		literal CloseBrace          = "}}", "%}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
-
-		regex Keyword = "true" | "false";
-		token Reference = !Keyword IdentifierBody;
-		token Name      = !Keyword IdentifierBody;
+		regex DecimalDigit = ['0'..'9'];
+		regex Keyword      = "true" | "false";
+		token Reference    = !Keyword IdentifierBody;
+		token Name         = !Keyword IdentifierBody;
 
 		literal Op      = "==", "!=", "<=", "<", ">=", ">", "or", "and", "contains";
 
@@ -40,6 +40,7 @@ namespace NLiquid.Parser.Syntax
 			| Unless      = "{%" s sm "unless" s sm  Expr s sm "%}" s sm Body=Block* s sm "{%" s sm "endunless" s sm "%}"
 			| Output      = "{{" s sm OutputExpr s sm  "}}"
 			| Assignment  = "{%" s sm "assign" s sm Name s sm "=" s sm FilteredExpr s "%}"
+			| Capture     = "{%" s sm "capture" s sm  Name s sm "%}" s sm Body=Block* s sm "{%" s sm "endcapture" s sm "%}"
 		}
 
 		syntax ElseIf = "{%" s sm "elsif" s sm  Expr s sm "%}" s sm ElseTrueBranch=Block*;
@@ -66,7 +67,12 @@ namespace NLiquid.Parser.Syntax
 		syntax Expr
 		{
 			| "true"
-			| "false"
+			| "false"			
+			| [SpanClass(Number)] 
+			  Number = Digits
+			  {
+				regex Digits = ("+" | "-")? DecimalDigit+ ("." DecimalDigit+)?;
+			  }
 			| Reference
 			| SStr = "'" Value=(!"'" Any)* "'"
 			| DStr = '"' Value=(!'"' Any)* '"'
@@ -88,8 +94,8 @@ namespace NLiquid.Parser.Syntax
 		{
 		  | Expr
 		precedence Filters:
-		  | Filter1 = FilteredExpr s sm "|" s sm Reference
-		  | Filter2 = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
+		  | FilterWithoutArgs = FilteredExpr s sm "|" s sm Reference
+		  | FilterWithArgs    = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
 		}
 	}
 }

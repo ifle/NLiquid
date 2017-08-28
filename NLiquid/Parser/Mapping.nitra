@@ -2,6 +2,8 @@
 using Nitra.Declarations;
 using NLiquid.Parser.Syntax;
 using NLiquid.Parser.Ast;
+using System.Globalization;
+
 namespace NLiquid.Parser.Mapping
 {
 	map syntax Grammar.Reference -> Reference = Reference(this);
@@ -29,9 +31,13 @@ namespace NLiquid.Parser.Mapping
 			Expr	-> Condition;
 			Body	-> Body;
 		  }
-		| Assignment -> Assignment
+		| Assignment -> LocalVariable.SimpleLocalVariable
 		  {
-			Name -> Name; FilteredExpr -> Initializer;
+				Name -> Name; FilteredExpr -> Initializer;
+		  }
+		| Capture -> LocalVariable.CaptureLocalVariable
+		  {
+				Name -> Name; Body -> Body;
 		  }
 	}
 
@@ -63,11 +69,12 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Expr -> Expr
 	{
-		| True         -> True  { Value = ParsedValue(NSpan(), true); }
-		| False        -> False { Value = ParsedValue(NSpan(), false); }
-		| SStr         -> SStr { Value = ParsedValue(Value, GetText(Value)); }
-		| DStr         -> DStr { Value = ParsedValue(Value, GetText(Value)); }
-		| Reference    -> Ref  { Reference -> Reference; }
+		| True         -> True   { Value = ParsedValue(NSpan(), true); }
+		| False        -> False  { Value = ParsedValue(NSpan(), false); }
+		| Number       -> Number { Value = ParsedValue(Digits, double.Parse(GetText(Digits), CultureInfo.InvariantCulture)); }
+		| SStr         -> SStr   { Value = ParsedValue(Value, GetText(Value)); }
+		| DStr         -> DStr   { Value = ParsedValue(Value, GetText(Value)); }
+		| Reference    -> LocalVariableRef  { Reference -> Reference; }
 		| MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
 		| Or           { Expr1 -> Expr1; Expr2 -> Expr2; }
 		| And          { Expr1 -> Expr1; Expr2 -> Expr2; }
@@ -78,7 +85,7 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.FilteredExpr -> Expr
 	{
-		| Filter1      -> Call { FilteredExpr -> Func; [] -> Args; }
-		| Filter2      -> Call { FilteredExpr -> Func; Args.Item1 -> Args; }
+		| FilterWithoutArgs   -> FilterCall { FilteredExpr -> Input; [] -> Args; }
+		| FilterWithArgs      -> FilterCall { FilteredExpr -> Input; Args.Item1 -> Args; }
 	}
 }

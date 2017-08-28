@@ -1,4 +1,4 @@
-{% assign my_variable = "test" %}
+﻿{% assign my_variable = "test" | pipe %}
 {% if my_variable contains true %}
   This statement is valid.
 {% endif %}

@@ -80,19 +80,31 @@ namespace NLiquid.Parser.Ast
 		Body: Statement*;
 	}
 
-	declaration Assignment : Statement
+	abstract declaration LocalVariable : Statement
 	{
 		symbol
 		{
 			in Type: TypeSymbol;
-			Kind = "assigment";
 		}
 
-		ContainingTable   = CurrentTable; // говорим в какой таблице определять переменную
-		Initializer.Scope = Scope;
-		Symbol.Type       = Initializer.Type;
+		ContainingTable   = CurrentTable;
 
-		Initializer : Expr;
+		| SimpleLocalVariable
+		  {
+			  Symbol.Kind       = "assigment";
+			  Symbol.Type       = Initializer.Type;
+			  Initializer.Scope = Scope;
+
+			  Initializer : Expr;
+		  }
+		| CaptureLocalVariable
+		  {
+			  Symbol.Kind       = "capture";
+			  Symbol.Type       = context.GetStringSymbol();
+			  Body.Scope        = Scope;
+
+			  Body: Statement*;
+		  }
 	}
 
 	abstract ast Binary : Expr
@@ -137,49 +149,55 @@ namespace NLiquid.Parser.Ast
 			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
 
 		| True
-		{
+		  {
 			Type = context.GetBooleanSymbol();
 			Value : bool;
-		}
+		  }
 		| False
-		{
+		  {
 			Type = context.GetBooleanSymbol();
 			Value : bool;
-		}
+		  }
+		| Number
+		  {
+			Type = context.GetNumberSymbol();
+			Value : double;
+		  }
 		| SStr
-		{
+		  {
 			Type = context.GetStringSymbol();
 			Value : string;
-		}
+		  }
 		| DStr
-		{
+		  {
 			Type = context.GetStringSymbol();
 			Value : string;
-		}
-		| Ref
-		 {
-			out Ref: Ref[AssignmentSymbol] = Reference.Ref.Resolve();
+		  }
+		| LocalVariableRef
+		  {
+			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
 			Reference.Scope = Scope;
 			Type = Ref.Symbol.Type;
 			Reference : Reference;
-		 }
+		  }
 		| MemberAccess
-		 {
+		  {
 			Qualifier.Scope = Scope;
 			Reference.Scope = Scope;
 
 			Qualifier : Expr;
 			Reference : Reference;
-		 }
+		  }
 		| Error        { Error(context, "Expected: Expr '}}'"); }
-		| Call
-		 {
-			Func.Scope = Scope;
+		| FilterCall
+		  {
+			Input.Scope = Scope;
 			Args.Scope = Scope;
 
-			Func : Expr;
-			Args : Expr*;
-		 }
+			//Reference : Reference;
+			Input     : Expr;
+			Args      : Expr*;
+		  }
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}
@@ -209,4 +227,8 @@ namespace NLiquid.Parser.Ast
 	declaration Object      : Type {}
 	declaration Array       : Type {}
 	declaration Dictionary  : Type {}
+
+	abstract declaration FilterDeclaration {
+		
+	}
 }

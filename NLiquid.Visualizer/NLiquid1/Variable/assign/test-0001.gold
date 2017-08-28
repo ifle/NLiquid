@@ -1,0 +1,7 @@
+{% assign my_variable = false %}
+{% if my_variable != true %}
+  {% assign my_variable_inner = "" %}
+  {{ my_variable }}
+  {{ my_variable_inner }}
+  This statement is valid.
+{% endif %}
