@@ -85,7 +85,13 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.FilteredExpr -> Expr
 	{
-		| FilterWithoutArgs   -> FilterCall { FilteredExpr -> Input; [] -> Args; }
-		| FilterWithArgs      -> FilterCall { FilteredExpr -> Input; Args.Item1 -> Args; }
+		| FilterWithoutArgs   -> Call { FilteredExpr -> Arg0; [] -> Args; Reference -> FanName; }
+		| FilterWithArgs      ->
+    Call
+    {
+      FilteredExpr -> Arg0;
+      Args.Item1   -> Args;
+      Reference    -> FanName;
+    }
 	}
 }

@@ -1,8 +1,11 @@
 ﻿using Nitra;
 using Nitra.Declarations;
 using Nitra.Runtime;
+
 using NLiquid;
+
 using System.IO;
+using System.Collections.Immutable;
 
 namespace NLiquid.Parser.Ast
 {
@@ -142,7 +145,7 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast Expr : BindableAst
 	{
-		in Type         : TypeSymbol = context.GetNilSymbol();
+		out Type        : TypeSymbol = context.GetNilSymbol();
 		in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
 
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
@@ -189,15 +192,18 @@ namespace NLiquid.Parser.Ast
 			Reference : Reference;
 		  }
 		| Error        { Error(context, "Expected: Expr '}}'"); }
-		| FilterCall
-		  {
-			Input.Scope = Scope;
-			Args.Scope = Scope;
+		| Call
+		{
+      out Ref : Ref[FunSymbol] = Utils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
 
-			//Reference : Reference;
-			Input     : Expr;
-			Args      : Expr*;
-		  }
+			FanName.Scope = Scope;
+			Arg0.Scope    = Scope;
+			Args.Scope    = Scope;
+
+			FanName : Reference;
+			Arg0    : Expr;
+			Args    : Expr*;
+		}
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}
@@ -207,7 +213,7 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast TypeReference
 	{
-		in Type: TypeSymbol;
+		in Type : TypeSymbol;
 
 		| Nil        { Type = context.GetNilSymbol();        }
 		| Number     { Type = context.GetNumberSymbol();     }
@@ -221,14 +227,18 @@ namespace NLiquid.Parser.Ast
 	declaration Root        : Container {}
 
 	declaration Nil         : Type {}
- 	declaration Number      : Type {}
-  	declaration Boolean     : Type {}
-  	declaration String      : Type {}
+	declaration Number      : Type {}
+	declaration Boolean     : Type {}
+	declaration String      : Type {}
 	declaration Object      : Type {}
 	declaration Array       : Type {}
 	declaration Dictionary  : Type {}
-
-	abstract declaration FilterDeclaration {
-		
+	declaration Fun					: Type
+	{
+		symbol
+		{
+			in Parameters : ImmutableArray[TypeSymbol];
+			in Result     : TypeSymbol;
+		}
 	}
 }
