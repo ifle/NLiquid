@@ -24,9 +24,15 @@ namespace NLiquid
   		def args = array(argCount);
   		args[0] = arg0Type;
   		argsTypes.CopyTo(args, 1);
-  		// бежим по func.Ambiguities и отбираем из них те, что имеют argCount аргументов,
-  		// и типы параметров которых урифицируются с типами из args.
-  		null
+  		def resolve(symbol : FunSymbol) : bool
+  		{
+  			if (symbol.IsParametersEvaluated && symbol.Parameters.Length == argCount)
+  				// проверяем, что каждый аргумент 'a' является подтипом параметра 'p' с соответствующим индексом.
+  				symbol.Parameters.ForAll2(args, (a, p) => NLiquidTypeUnifier.Instance.TryRequire(p, a))
+  			else
+  				false
+  		}
+  		func.Resolve(resolve)
   	}
   }
 }
