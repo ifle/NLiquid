@@ -87,11 +87,11 @@ namespace NLiquid.Parser.Mapping
 	{
 		| FilterWithoutArgs   -> Call { FilteredExpr -> Arg0; [] -> Args; Reference -> FanName; }
 		| FilterWithArgs      ->
-    Call
-    {
-      FilteredExpr -> Arg0;
-      Args.Item1   -> Args;
-      Reference    -> FanName;
-    }
+			Call
+			{
+				FilteredExpr -> Arg0;
+				Args.Item1   -> Args;
+				Reference    -> FanName;
+			}
 	}
 }

@@ -172,29 +172,29 @@ namespace NLiquid.Parser.Ast
 			Value : string;
 		  }
 		| DStr
-		  {
+		{
 			Type = context.GetStringSymbol();
 			Value : string;
-		  }
+		}
 		| LocalVariableRef
-		  {
+		{
 			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
 			Reference.Scope = Scope;
 			Type = Ref.Symbol.Type;
 			Reference : Reference;
-		  }
+		}
 		| MemberAccess
-		  {
+		{
 			Qualifier.Scope = Scope;
 			Reference.Scope = Scope;
 
 			Qualifier : Expr;
 			Reference : Reference;
-		  }
+		}
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call
 		{
-      out Ref : Ref[FunSymbol] = AstUtils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
+			out Ref : Ref[FunSymbol] = AstUtils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
 
 			FanName.Scope = Scope;
 			Arg0.Scope    = Scope;

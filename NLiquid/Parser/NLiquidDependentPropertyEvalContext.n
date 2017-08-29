@@ -15,20 +15,20 @@ using NLiquid.Parser.Ast;
 
 namespace NLiquid
 {
-  public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
-  {
-    public Nil         : NilSymbol;
-    public Number      : NumberSymbol;
-    public Boolean     : BooleanSymbol;
-    public String      : StringSymbol;
-    public Object      : ObjectSymbol;
-    public Array       : ArraySymbol;
-    public Dictionary  : DictionarySymbol;
+	public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
+	{
+		public Nil         : NilSymbol;
+		public Number      : NumberSymbol;
+		public Boolean     : BooleanSymbol;
+		public String      : StringSymbol;
+		public Object      : ObjectSymbol;
+		public Array       : ArraySymbol;
+		public Dictionary  : DictionarySymbol;
 
-    _functions   : array[FunSymbol];
+		_functions   : array[FunSymbol];
 
-    public this(nil : NilSymbol, number : NumberSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, @array : ArraySymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
-    {
+		public this(nil : NilSymbol, number : NumberSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, @array : ArraySymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
+		{
 			Nil        = nil;
 			Number     = number;
 			Boolean    = boolean;
@@ -38,13 +38,13 @@ namespace NLiquid
 			Dictionary = dictionary;
 			_functions = functions;
 
-			  def named   = array[nil : DeclarationSymbol, number, boolean, @string, @object, @array, @dictionary];
-      	def builder = ImmutableArray.CreateBuilder(named.Length + _functions.Length);
-      	builder.AddRange(named);
-      	builder.AddRange(_functions);
-      	this.PredefinedSymbols = builder.MoveToImmutable();
-    }
+			def named   = array[nil : DeclarationSymbol, number, boolean, @string, @object, @array, @dictionary];
+			def builder = ImmutableArray.CreateBuilder(named.Length + _functions.Length);
+			builder.AddRange(named);
+			builder.AddRange(_functions);
+			this.PredefinedSymbols = builder.MoveToImmutable();
+		}
 
-    public PredefinedSymbols : ImmutableArray[DeclarationSymbol] { get; }
-  }
+		public PredefinedSymbols : ImmutableArray[DeclarationSymbol] { get; }
+	}
 }

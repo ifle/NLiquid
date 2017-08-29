@@ -23,84 +23,84 @@ using NLiquid.Parser.Ast;
 
 namespace NLiquid
 {
-  class ProjectSupport : IProjectSupport
-  {
-    static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
-    static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
-    static NoSpan : NSpan              = NSpan(0);
+	class ProjectSupport : IProjectSupport
+	{
+		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
+		static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
+		static NoSpan : NSpan              = NSpan(0);
 
-    public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
-    {
-      IgnoreParams();
+		public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
+		{
+			IgnoreParams();
 
-      def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
-      {
-        def name   = Name(NoLocation, name);
-        def symbol = ExternalDeclaration.[Type](name).DefineSymbol();
-        symbol
-      }
-      def nilSymbol        = defineSymbol.[NilSymbol]("nil");
-      def numberSymbol     = defineSymbol.[NumberSymbol]("number");
-      def boolSymbol       = defineSymbol.[BooleanSymbol]("bool");
-      def stringSymbol     = defineSymbol.[StringSymbol]("string");
-      def objectSymbol     = defineSymbol.[ObjectSymbol]("object");
-      def arraySymbol      = defineSymbol.[ArraySymbol]("array");
-      def dictionarySymbol = defineSymbol.[DictionarySymbol]("dictionary");
+			def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
+			{
+				def name   = Name(NoLocation, name);
+				def symbol = ExternalDeclaration.[Type](name).DefineSymbol();
+				symbol
+			}
+			def nilSymbol        = defineSymbol.[NilSymbol]("nil");
+			def numberSymbol     = defineSymbol.[NumberSymbol]("number");
+			def boolSymbol       = defineSymbol.[BooleanSymbol]("bool");
+			def stringSymbol     = defineSymbol.[StringSymbol]("string");
+			def objectSymbol     = defineSymbol.[ObjectSymbol]("object");
+			def arraySymbol      = defineSymbol.[ArraySymbol]("array");
+			def dictionarySymbol = defineSymbol.[DictionarySymbol]("dictionary");
 
-      // Filter "round" with no additional parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-      def round0FunSymbol   = defineSymbol.[FunSymbol]("round");
-      round0FunSymbol.Parameters = ImmutableArray.Create(numberSymbol);
-      round0FunSymbol.Result     = numberSymbol;
+			// Filter "round" with no additional parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
+			def round0FunSymbol   = defineSymbol.[FunSymbol]("round");
+			round0FunSymbol.Parameters = ImmutableArray.Create(numberSymbol);
+			round0FunSymbol.Result     = numberSymbol;
 
-      // Filter "round" with additional one parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-      def round2FunSymbol   = defineSymbol.[FunSymbol]("round");
-      round2FunSymbol.Parameters = ImmutableArray.Create(numberSymbol, numberSymbol);
-      round2FunSymbol.Result     = numberSymbol;
+			// Filter "round" with additional one parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
+			def round2FunSymbol   = defineSymbol.[FunSymbol]("round");
+			round2FunSymbol.Parameters = ImmutableArray.Create(numberSymbol, numberSymbol);
+			round2FunSymbol.Result     = numberSymbol;
 
-      def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol,
-				round0FunSymbol, round2FunSymbol);
-      context
-    }
+			def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol,
+																										 round0FunSymbol, round2FunSymbol);
+			context
+		}
 
-    public RefreshProject(cancellationToken : System.Threading.CancellationToken, files : System.Collections.Immutable.ImmutableArray[Nitra.Declarations.FileEvalPropertiesData], data : object) : void
-    {
-        def context = DecomposeData(data);
-        context.CancellationToken = cancellationToken;
+		public RefreshProject(cancellationToken : System.Threading.CancellationToken, files : System.Collections.Immutable.ImmutableArray[Nitra.Declarations.FileEvalPropertiesData], data : object) : void
+		{
+			def context = DecomposeData(data);
+			context.CancellationToken = cancellationToken;
 
-        when (cancellationToken.IsCancellationRequested)
-        return;
+			when (cancellationToken.IsCancellationRequested)
+			return;
 
-        def scope = TableScope("Variables");
+			def scope = TableScope("Variables");
 
-        foreach (file in files)
-            when (file.Ast is CompilationUnit as cu)
-              cu.Scope = scope;
+			foreach (file in files)
+			when (file.Ast is CompilationUnit as cu)
+			cu.Scope = scope;
 
-        def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedSymbols);
-        evalHost.EvalProperties(context, "Pass0", 0);
-        evalHost.EvalProperties(context, "Pass1", 1);
-    }
+			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedSymbols);
+			evalHost.EvalProperties(context, "Pass0", 0);
+			evalHost.EvalProperties(context, "Pass1", 1);
+		}
 
-    public DeconstructType(symbol : Nitra.Declarations.DeclarationSymbol, _type : out Nitra.Declarations.TypeSymbol, typeArgs : out System.Collections.Immutable.ImmutableArray[Nitra.Declarations.TypeSymbol]) : bool
-    {
-      IgnoreParams();
-      false
-    }
+		public DeconstructType(symbol : Nitra.Declarations.DeclarationSymbol, _type : out Nitra.Declarations.TypeSymbol, typeArgs : out System.Collections.Immutable.ImmutableArray[Nitra.Declarations.TypeSymbol]) : bool
+		{
+			IgnoreParams();
+			false
+		}
 
-    public GetSymbolById(data : object, symbolId : int) : ValueOption[Nitra.Declarations.DeclarationSymbol]
-    {
-      IgnoreParams();
-      VNone()
-    }
+		public GetSymbolById(data : object, symbolId : int) : ValueOption[Nitra.Declarations.DeclarationSymbol]
+		{
+			IgnoreParams();
+			VNone()
+		}
 
-    public VisitGlobalSymbols(data : object, callback : System.Predicate[Nitra.Declarations.DeclarationSymbol]) : void
-    {
-      IgnoreParams();
-    }
+		public VisitGlobalSymbols(data : object, callback : System.Predicate[Nitra.Declarations.DeclarationSymbol]) : void
+		{
+			IgnoreParams();
+		}
 
-    public DecomposeData(data : object) : NLiquidDependentPropertyEvalContext
-    {
-      data :> NLiquidDependentPropertyEvalContext
-    }
-  }
+		public DecomposeData(data : object) : NLiquidDependentPropertyEvalContext
+		{
+			data :> NLiquidDependentPropertyEvalContext
+		}
+	}
 }
