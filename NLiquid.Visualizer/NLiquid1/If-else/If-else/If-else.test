@@ -1,0 +1,8 @@
+{% assign customer = 'kevin' %}
+{% if customer == 'kevin' %}
+  Hey Kevin!
+{% elsif customer == 'anonymous' %}
+  Hey Anonymous!
+{% else %}
+  Hi Stranger!
+{% endif %}

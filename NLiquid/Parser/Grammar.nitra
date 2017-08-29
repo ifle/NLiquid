@@ -9,10 +9,10 @@ namespace NLiquid.Parser.Syntax
 		using Nitra.Identifiers;
 
 		[SpanClass(OpenBrace)]  regex OpenTag  = "{%";
-        [SpanClass(CloseBrace)] regex CloseTag = "%}";
+		[SpanClass(CloseBrace)] regex CloseTag = "%}";
 
 		[SpanClass(OpenBrace)]  regex OpenOutput  = "{{";
-        [SpanClass(CloseBrace)] regex CloseOutput = "}}";
+		[SpanClass(CloseBrace)] regex CloseOutput = "}}";
 
 		keyword regex ['a'..'z', '_']+ rule S;
 		regex DecimalDigit = ['0'..'9'];
@@ -41,10 +41,13 @@ namespace NLiquid.Parser.Syntax
 					regex TagStart = "{{" | "{%";
 				}
 			| Comment = MultiLineComment
-			| If      = OpenTag s sm "if" s sm  Expr s sm CloseTag s sm TrueBranch=Block* s sm
-			  ElseIf=(ElseIf*) s sm
-			  Else=(Else?) s sm
-			  CloseTag s sm "endif" s sm CloseTag
+			| If      =
+				OpenTag s sm "if" s sm  Expr s sm CloseTag s sm
+					TrueBranch=Block* s sm
+				ElseIf* s sm
+				Else? s sm
+				OpenTag s sm "endif" s sm CloseTag
+
 			| Unless      = OpenTag s sm "unless" s sm  Expr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endunless" s sm CloseTag
 			| Output      = OpenOutput s sm OutputExpr s sm  CloseOutput
 			| Assignment  = OpenTag s sm "assign" s sm Name s sm "=" s sm FilteredExpr s CloseTag
@@ -91,10 +94,10 @@ namespace NLiquid.Parser.Syntax
 
 		syntax FilteredExpr
 		{
-		  | Expr
+			| Expr
 		precedence Filters:
-		  | FilterWithoutArgs = FilteredExpr s sm "|" s sm Reference
-		  | FilterWithArgs    = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
+			| FilterWithoutArgs = FilteredExpr s sm "|" s sm Reference
+			| FilterWithArgs    = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
 		}
 	}
 }

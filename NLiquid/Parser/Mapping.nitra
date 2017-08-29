@@ -23,8 +23,8 @@ namespace NLiquid.Parser.Mapping
 		  {
 				Expr       -> Condition;
 				TrueBranch -> Body;
-				ElseIf    -> ElseIfs;
-				Else      -> Else;
+				ElseIfs    -> ElseIfs;
+				ElseOpt    -> Else;
 		  }
 		| Unless -> Unless
 		  {
