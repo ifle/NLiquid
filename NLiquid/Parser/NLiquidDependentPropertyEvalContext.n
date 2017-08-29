@@ -13,9 +13,8 @@ using System.Linq;
 
 using NLiquid.Parser.Ast;
 
-namespace NLiquid.Parser
+namespace NLiquid
 {
-  [Record]
   public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
   {
     public Nil         : NilSymbol;
@@ -26,9 +25,26 @@ namespace NLiquid.Parser
     public Array       : ArraySymbol;
     public Dictionary  : DictionarySymbol;
 
-    public PredefinedSymbols : ImmutableArray[DeclarationSymbol]
+    _functions   : array[FunSymbol];
+
+    public this(nil : NilSymbol, number : NumberSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, @array : ArraySymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
     {
-      get { ImmutableArray.Create(Nil, Number, Boolean, String, Object, Array, Dictionary); }
+			Nil        = nil;
+			Number     = number;
+			Boolean    = boolean;
+			String     = @string;
+			Object     = @object;
+			Array      = @array;
+			Dictionary = dictionary;
+			_functions = functions;
+
+			  def named   = array[nil : DeclarationSymbol, number, boolean, @string, @object, @array, @dictionary];
+      	def builder = ImmutableArray.CreateBuilder(named.Length + _functions.Length);
+      	builder.AddRange(named);
+      	builder.AddRange(_functions);
+      	this.PredefinedSymbols = builder.MoveToImmutable();
     }
+
+    public PredefinedSymbols : ImmutableArray[DeclarationSymbol] { get; }
   }
 }

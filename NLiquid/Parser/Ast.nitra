@@ -194,7 +194,7 @@ namespace NLiquid.Parser.Ast
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call
 		{
-      out Ref : Ref[FunSymbol] = Utils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
+      out Ref : Ref[FunSymbol] = AstUtils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
 
 			FanName.Scope = Scope;
 			Arg0.Scope    = Scope;
