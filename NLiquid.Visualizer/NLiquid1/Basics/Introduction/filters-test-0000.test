@@ -1,1 +1,1 @@
-{{ "/my/fancy/url" | append: ".html" }}
+﻿{{ 12.4 | round }}
