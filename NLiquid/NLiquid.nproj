@@ -75,6 +75,18 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Filters\FilterAttribute.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Filters\FilterContainerAttribute.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Filters\FilterManager.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Filters\NumberFilters.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NLiquidTypeUnifier.n">
       <SubType>Code</SubType>
     </Compile>
@@ -106,6 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.n" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Filters" />
     <Folder Include="Parser\" />
     <Folder Include="Properties\" />
   </ItemGroup>
