@@ -20,25 +20,25 @@ namespace NLiquid.Parser.Mapping
 		| Comment -> Comment {}
 		| Output -> Output { OutputExpr -> Expr; }
 		| If -> If
-		  {
+		{
 				Expr       -> Condition;
 				TrueBranch -> Body;
 				ElseIfs    -> ElseIfs;
 				ElseOpt    -> Else;
-		  }
+		}
 		| Unless -> Unless
-		  {
-			Expr	-> Condition;
-			Body	-> Body;
-		  }
+		{
+			Expr -> Condition;
+			Body -> Body;
+		}
 		| Assignment -> LocalVariable.SimpleLocalVariable
-		  {
+		{
 				Name -> Name; FilteredExpr -> Initializer;
-		  }
+		}
 		| Capture -> LocalVariable.CaptureLocalVariable
-		  {
-				Name -> Name; Body -> Body;
-		  }
+		{
+			Name -> Name; Body -> Body;
+		}
 	}
 
 	map syntax Grammar.ElseIf -> ElseIf

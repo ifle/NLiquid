@@ -152,25 +152,25 @@ namespace NLiquid.Parser.Ast
 			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
 
 		| True
-		  {
+		{
 			Type = context.GetBooleanSymbol();
 			Value : bool;
-		  }
+		}
 		| False
-		  {
+		{
 			Type = context.GetBooleanSymbol();
 			Value : bool;
-		  }
+		}
 		| Number
-		  {
+		{
 			Type = context.GetNumberSymbol();
 			Value : double;
-		  }
+		}
 		| SStr
-		  {
+		{
 			Type = context.GetStringSymbol();
 			Value : string;
-		  }
+		}
 		| DStr
 		{
 			Type = context.GetStringSymbol();
@@ -239,6 +239,8 @@ namespace NLiquid.Parser.Ast
 		{
 			in Parameters : ImmutableArray[TypeSymbol];
 			in Result     : TypeSymbol;
+
+			Kind = "function type";
 		}
 	}
 }

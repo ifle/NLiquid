@@ -25,6 +25,13 @@ namespace NLiquid
 {
 	class ProjectSupport : IProjectSupport
 	{
+		[Record]
+		private class ProjectData
+		{
+			public Context : NLiquidDependentPropertyEvalContext;
+			public Root    : RootSymbol;
+		}
+
 		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
 		static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
 		static NoSpan : NSpan              = NSpan(0);
@@ -32,12 +39,22 @@ namespace NLiquid
 		public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
 		{
 			IgnoreParams();
+			def root = RootSymbol() <-
+			{
+				FullName = "<root>";
+				Kind = "root";
+			};
+			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));
 
 			def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
 			{
-				def name   = Name(NoLocation, name);
-				def symbol = ExternalDeclaration.[Type](name).DefineSymbol();
-				symbol
+        def name = Name(NoLocation, name);
+        def symbol =
+          if (putToRootScope)
+            ExternalDeclaration.[Type](name).DefineSymbol(root.MemberTable)
+          else
+            ExternalDeclaration.[Type](name).DefineSymbol();
+        symbol
 			}
 			def nilSymbol        = defineSymbol.[NilSymbol]("nil");
 			def numberSymbol     = defineSymbol.[NumberSymbol]("number");
@@ -59,22 +76,23 @@ namespace NLiquid
 
 			def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol,
 																										 round0FunSymbol, round2FunSymbol);
-			context
+
+			ProjectData(context, root)
 		}
 
 		public RefreshProject(cancellationToken : System.Threading.CancellationToken, files : System.Collections.Immutable.ImmutableArray[Nitra.Declarations.FileEvalPropertiesData], data : object) : void
 		{
-			def context = DecomposeData(data);
+			def (context, root) = DecomposeData(data);
 			context.CancellationToken = cancellationToken;
 
 			when (cancellationToken.IsCancellationRequested)
-			return;
+				return;
 
-			def scope = TableScope("Variables");
+			def scope = root.MemberTable;
 
 			foreach (file in files)
-			when (file.Ast is CompilationUnit as cu)
-			cu.Scope = scope;
+				when (file.Ast is CompilationUnit as cu)
+					cu.Scope = scope;
 
 			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedSymbols);
 			evalHost.EvalProperties(context, "Pass0", 0);
@@ -98,9 +116,9 @@ namespace NLiquid
 			IgnoreParams();
 		}
 
-		public DecomposeData(data : object) : NLiquidDependentPropertyEvalContext
+		DecomposeData(data : object) : ProjectData
 		{
-			data :> NLiquidDependentPropertyEvalContext
+			data :> ProjectData
 		}
 	}
 }
