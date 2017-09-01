@@ -15,7 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
+using NLiquid.Filters;
 using NLiquid.Parser;
 using NLiquid.Parser.Ast;
 
@@ -56,26 +58,44 @@ namespace NLiquid
             ExternalDeclaration.[Type](name).DefineSymbol();
         symbol
 			}
-			def nilSymbol        = defineSymbol.[NilSymbol]("nil");
-			def numberSymbol     = defineSymbol.[NumberSymbol]("number");
+			def nilSymbol        = defineSymbol.[NilSymbol]("nil"); // данный символ не нужен
+			def doubleSymbol     = defineSymbol.[DoubleSymbol]("double");
+			def intSymbol        = defineSymbol.[IntSymbol]("int");
 			def boolSymbol       = defineSymbol.[BooleanSymbol]("bool");
 			def stringSymbol     = defineSymbol.[StringSymbol]("string");
-			def objectSymbol     = defineSymbol.[ObjectSymbol]("object");
-			def arraySymbol      = defineSymbol.[ArraySymbol]("array");
+			def objectSymbol     = defineSymbol.[ObjectSymbol]("object"); // символ должен описывать списко членов (свойств)
 			def dictionarySymbol = defineSymbol.[DictionarySymbol]("dictionary");
 
-			// Filter "round" with no additional parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-			def round0FunSymbol   = defineSymbol.[FunSymbol]("round");
-			round0FunSymbol.Parameters = ImmutableArray.Create(numberSymbol);
-			round0FunSymbol.Result     = numberSymbol;
+			def typeToSymbol(type : System.Type) : TypeSymbol
+			{
+				match (Type.GetTypeCode(type))
+				{
+					| TypeCode.Boolean => boolSymbol
+					| TypeCode.Int32   => intSymbol
+					| TypeCode.Double  => doubleSymbol
+					| TypeCode.String  => stringSymbol
+					// здесь надо добавить остальны е поддерживаемее типы
+					| _ => null
+				}
+			}
+			def functions = List();
+      foreach (type when type.IsClass && type.GetCustomAttribute.[FilterContainerAttribute]() != null in Assembly.GetExecutingAssembly().GetTypes())
+		  foreach (methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+			{
+    		def attrs = methodInfo.GetCustomAttributesData();
+    		foreach (attr when attr.AttributeType == typeof(FilterContainerAttribute) in attrs)
+    		{
+    			def filterName = attr.ConstructorArguments[0].Value :> string;
+	        def name       = Name(NoLocation, filterName);
+          def funSymbol  = FilterFunDeclaration(name, methodInfo).DefineSymbol(root.MemberTable) :> FunSymbol;
+					funSymbol.Parameters = methodInfo.GetParameters().Select(p => typeToSymbol(p.ParameterType)).ToImmutableArray();
+					funSymbol.Result     = typeToSymbol(methodInfo.ReturnType);
+					functions.Add(funSymbol);
+    		}
+			}
 
-			// Filter "round" with additional one parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-			def round2FunSymbol   = defineSymbol.[FunSymbol]("round");
-			round2FunSymbol.Parameters = ImmutableArray.Create(numberSymbol, numberSymbol);
-			round2FunSymbol.Result     = numberSymbol;
-
-			def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol,
-																										 round0FunSymbol, round2FunSymbol);
+			def context = NLiquidDependentPropertyEvalContext(nilSymbol, intSymbol, doubleSymbol, boolSymbol, stringSymbol, objectSymbol, dictionarySymbol,
+																										 functions.ToArray());
 
 			ProjectData(context, root)
 		}

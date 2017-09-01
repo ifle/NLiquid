@@ -9,7 +9,8 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-  public class FilterContainerAttribute: Attribute
+	[Record]
+  public class FilterContainerAttribute : Attribute
   {
   }
 }

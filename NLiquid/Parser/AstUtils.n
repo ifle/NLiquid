@@ -18,12 +18,13 @@ namespace NLiquid
 {
 	module AstUtils
 	{
-		public GetNilSymbol(this ctx: DependentPropertyEvalContext): NilSymbol               { GetContext(ctx).Nil        }
-		public GetNumberSymbol(this ctx: DependentPropertyEvalContext): NumberSymbol         { GetContext(ctx).Number     }
-		public GetBooleanSymbol(this ctx: DependentPropertyEvalContext): BooleanSymbol       { GetContext(ctx).Boolean    }
-		public GetStringSymbol(this ctx: DependentPropertyEvalContext): StringSymbol         { GetContext(ctx).String     }
-		public GetObjectSymbol(this ctx: DependentPropertyEvalContext): ObjectSymbol         { GetContext(ctx).Object     }
-		public GetArraySymbol(this ctx: DependentPropertyEvalContext): ArraySymbol           { GetContext(ctx).Array      }
+		public GetNilSymbol(this     ctx : DependentPropertyEvalContext): NilSymbol            { GetContext(ctx).Nil        }
+		public GetDoubleSymbol(this  ctx : DependentPropertyEvalContext): DoubleSymbol         { GetContext(ctx).Double     }
+		public GetIntSymbol(this     ctx : DependentPropertyEvalContext): IntSymbol            { GetContext(ctx).Int        }
+		public GetBooleanSymbol(this ctx : DependentPropertyEvalContext): BooleanSymbol        { GetContext(ctx).Boolean    }
+		public GetStringSymbol(this  ctx : DependentPropertyEvalContext): StringSymbol         { GetContext(ctx).String     }
+		public GetObjectSymbol(this  ctx : DependentPropertyEvalContext): ObjectSymbol         { GetContext(ctx).Object     }
+		public GetArraySymbol(this   ctx : DependentPropertyEvalContext, elemType : TypeSymbol): ArraySymbol           { GetContext(ctx).GetArrayType(elemType : TypeSymbol)  }
 		public GetDictionarySymbol(this ctx: DependentPropertyEvalContext): DictionarySymbol { GetContext(ctx).Dictionary }
 
 		GetContext(ctx: DependentPropertyEvalContext): NLiquidDependentPropertyEvalContext

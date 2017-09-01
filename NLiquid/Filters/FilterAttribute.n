@@ -9,13 +9,9 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
+	[Record]
   public class FilterAttribute: Attribute
 	{
-		public this(name: string)
-		{
-			Name = name;
-		}
-
-		public Name: string { get; private set; }
+		public Name : string { get; }
 	}
 }

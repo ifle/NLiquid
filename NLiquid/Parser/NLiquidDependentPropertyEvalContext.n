@@ -18,27 +18,27 @@ namespace NLiquid
 	public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
 	{
 		public Nil         : NilSymbol;
-		public Number      : NumberSymbol;
+		public Int         : IntSymbol;
+		public Double      : DoubleSymbol;
 		public Boolean     : BooleanSymbol;
 		public String      : StringSymbol;
 		public Object      : ObjectSymbol;
-		public Array       : ArraySymbol;
 		public Dictionary  : DictionarySymbol;
 
 		_functions   : array[FunSymbol];
 
-		public this(nil : NilSymbol, number : NumberSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, @array : ArraySymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
+		public this(nil : NilSymbol, @int : IntSymbol, @double : DoubleSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
 		{
 			Nil        = nil;
-			Number     = number;
+			Int        = @int;
+			Double     = @double;
 			Boolean    = boolean;
 			String     = @string;
 			Object     = @object;
-			Array      = @array;
 			Dictionary = dictionary;
 			_functions = functions;
 
-			def named   = array[nil : DeclarationSymbol, number, boolean, @string, @object, @array, @dictionary];
+			def named   = array[nil : DeclarationSymbol, @int, double, boolean, @string, @object, @dictionary];
 			def builder = ImmutableArray.CreateBuilder(named.Length + _functions.Length);
 			builder.AddRange(named);
 			builder.AddRange(_functions);
@@ -46,5 +46,11 @@ namespace NLiquid
 		}
 
 		public PredefinedSymbols : ImmutableArray[DeclarationSymbol] { get; }
+
+		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
+		{
+			// TODO: реализовать создание и кэширование массивов с конкретным типом
+			null
+		}
 	}
 }
