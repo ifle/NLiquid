@@ -1,0 +1,83 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+using Nitra;
+using Nitra.Declarations;
+
+using NLiquid.Parser;
+using NLiquid.Parser.Ast;
+
+namespace NLiquid
+{
+  public module Helpers
+  {
+    public static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
+    public static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
+    public static NoSpan : NSpan              = NSpan(0);
+    
+    public static DefineSymbol[Type](name : string, scope: TableScope = null) : Type where Type: DeclarationSymbol
+		{
+      def name = Name(NoLocation, name);
+      def symbol = ExternalDeclaration.[Type](name).DefineSymbol(scope);          
+      symbol
+		}
+		
+		public static CreateTypeSymbol(type: System.Type, globalTypes: NLiquidGlobalTypes) : TypeSymbol
+		{
+			match (System.Type.GetTypeCode(type))
+      {
+          | TypeCode.Boolean => globalTypes.Boolean                  
+          | TypeCode.Byte
+          | TypeCode.Decimal
+          | TypeCode.Double
+          | TypeCode.Int16
+          | TypeCode.Int32
+          | TypeCode.Int64
+          | TypeCode.SByte
+          | TypeCode.Single
+          | TypeCode.UInt16
+          | TypeCode.UInt32
+          | TypeCode.UInt64  => globalTypes.Number
+          | TypeCode.Empty   => globalTypes.Nil
+          | TypeCode.Char
+          | TypeCode.String  => globalTypes.String
+          | TypeCode.Object  => globalTypes.Object
+          //| TypeCode.DateTime
+                    
+          | _                => throw InvalidOperationException()
+                    
+      }            
+		}
+		
+		public GetGlobalTypes(this ctx: DependentPropertyEvalContext): NLiquidGlobalTypes
+		{
+			(ctx :> NLiquidDependentPropertyEvalContext).PredefinedTypes.GlobalTypes;
+		}		
+
+		public ResolveCall(func : Ref[DeclarationSymbol], arg0Type : TypeSymbol, argsTypes : ImmutableArray[TypeSymbol]) : Ref[FunSymbol]
+		{
+			def argCount = argsTypes.Length + 1; // '1' for arg0Type
+			def args     = array(argCount);
+			args[0] = arg0Type;
+			argsTypes.CopyTo(args, 1);
+
+			def resolve(symbol : FunSymbol) : bool
+			{
+				if (symbol.IsParametersEvaluated && symbol.Parameters.Length == argCount)
+				// check that each argument type (a) is a subtype of the parameter type (p).
+				symbol.Parameters.ForAll2(args, (a, p) => NLiquidTypeUnifier.Instance.TryRequire(p, a))
+				else
+				false
+			}
+			func.Resolve(resolve)
+		}
+  }
+}

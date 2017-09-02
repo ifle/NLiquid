@@ -103,7 +103,7 @@ namespace NLiquid.Parser.Ast
 		| CaptureLocalVariable
 		  {
 			  Symbol.Kind       = "capture";
-			  Symbol.Type       = context.GetStringSymbol();
+			  Symbol.Type       = context.GetGlobalTypes().String;
 			  Body.Scope        = Scope;
 
 			  Body: Statement*;
@@ -127,25 +127,25 @@ namespace NLiquid.Parser.Ast
 
 	abstract ast EqualExpr : SameTypesExpr
 	{
-		Type = context.GetBooleanSymbol();
+		Type = context.GetGlobalTypes().Boolean;
 	}
 
 	abstract ast OrAndExpr : SameTypesExpr
 	{
-		Type = context.GetBooleanSymbol();
+		Type = context.GetGlobalTypes().Boolean;
 	}
 
 	abstract ast ContainsExpr : SameTypesExpr
 	{
-		Type = context.GetBooleanSymbol();
+		Type = context.GetGlobalTypes().Boolean;
 
-		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetStringSymbol()))
+		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetGlobalTypes().String))
 			Expr1.Error(context, $"Expected string expression but found $(self.Expr1.Type).");
 	}
 
 	abstract ast Expr : BindableAst
 	{
-		out Type        : TypeSymbol = context.GetNilSymbol();
+		out Type        : TypeSymbol = context.GetGlobalTypes().Nil;
 		in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
 
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
@@ -153,27 +153,27 @@ namespace NLiquid.Parser.Ast
 
 		| True
 		{
-			Type = context.GetBooleanSymbol();
+			Type = context.GetGlobalTypes().Boolean;
 			Value : bool;
 		}
 		| False
 		{
-			Type = context.GetBooleanSymbol();
+			Type = context.GetGlobalTypes().Boolean;
 			Value : bool;
 		}
 		| Number
 		{
-			Type = context.GetNumberSymbol();
+			Type = context.GetGlobalTypes().Number;
 			Value : double;
 		}
 		| SStr
 		{
-			Type = context.GetStringSymbol();
+			Type = context.GetGlobalTypes().String;
 			Value : string;
 		}
 		| DStr
 		{
-			Type = context.GetStringSymbol();
+			Type = context.GetGlobalTypes().String;
 			Value : string;
 		}
 		| LocalVariableRef
@@ -194,7 +194,7 @@ namespace NLiquid.Parser.Ast
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call
 		{
-			out Ref : Ref[FunSymbol] = AstUtils.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
+			out Ref : Ref[FunSymbol] = Helpers.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
 
 			FanName.Scope = Scope;
 			Arg0.Scope    = Scope;
@@ -215,13 +215,13 @@ namespace NLiquid.Parser.Ast
 	{
 		in Type : TypeSymbol;
 
-		| Nil        { Type = context.GetNilSymbol();        }
-		| Number     { Type = context.GetNumberSymbol();     }
-		| Boolean    { Type = context.GetBooleanSymbol();    }
-		| String     { Type = context.GetStringSymbol();     }
-		| Object     { Type = context.GetObjectSymbol();     }
-		| Array      { Type = context.GetArraySymbol();      }
-		| Dictionary { Type = context.GetDictionarySymbol(); }
+		| Nil        { Type = context.GetGlobalTypes().Nil;        }
+		| Number     { Type = context.GetGlobalTypes().Number;     }
+		| Boolean    { Type = context.GetGlobalTypes().Boolean;    }
+		| String     { Type = context.GetGlobalTypes().String;     }
+		| Object     { Type = context.GetGlobalTypes().Object;     }
+		| Array      { Type = context.GetGlobalTypes().Array;      }
+		| Dictionary { Type = context.GetGlobalTypes().Dictionary; }
 	}
 
 	declaration Root        : Container {}
@@ -233,7 +233,7 @@ namespace NLiquid.Parser.Ast
 	declaration Object      : Type {}
 	declaration Array       : Type {}
 	declaration Dictionary  : Type {}
-	declaration Fun					: Type
+	declaration Fun			: Type
 	{
 		symbol
 		{

@@ -1,0 +1,47 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using Nitra;
+using Nitra.Declarations;
+using Nitra.Runtime;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+using NLiquid.Parser.Ast;
+
+namespace NLiquid
+{
+  public class NLiquidGlobalTypes
+  {    
+    public Nil               : NilSymbol;
+		public Number            : NumberSymbol;
+		public Boolean           : BooleanSymbol;
+		public String            : StringSymbol;
+		public Object            : ObjectSymbol;
+		public Array             : ArraySymbol;
+		public Dictionary        : DictionarySymbol;
+		public Types             : ImmutableArray[DeclarationSymbol];
+		
+		public this(scope: TableScope = null)
+		{
+		  Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
+			Number     = Helpers.DefineSymbol.[NumberSymbol]("number", scope);
+			Boolean    = Helpers.DefineSymbol.[BooleanSymbol]("bool", scope);
+			String     = Helpers.DefineSymbol.[StringSymbol]("string", scope);
+			Object     = Helpers.DefineSymbol.[ObjectSymbol]("object", scope);
+			Array      = Helpers.DefineSymbol.[ArraySymbol]("array", scope);
+			Dictionary = Helpers.DefineSymbol.[DictionarySymbol]("dictionary", scope);
+			
+			def named   = array[Nil : DeclarationSymbol, Number, Boolean, String, Object, Array, Dictionary];
+			def builder = ImmutableArray.CreateBuilder(named.Length);
+			builder.AddRange(named);
+			
+			Types = builder.MoveToImmutable();
+		}	
+  }
+}

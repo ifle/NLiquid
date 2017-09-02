@@ -13,6 +13,12 @@ namespace NLiquid.Filters
   public class NumberFilters
   {
     [Filter("round")]
+		public static Round(val: double): double
+		{
+			Math.Round(val)
+		}
+		
+    [Filter("round")]
 		public static Round(val: double, digits: int): double
 		{
 			Math.Round(val, digits)

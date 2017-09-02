@@ -18,6 +18,7 @@ using System.Linq;
 
 using NLiquid.Parser;
 using NLiquid.Parser.Ast;
+using NLiquid.Filters;
 
 [assembly: ProjectSupport("NLiquid", typeof(NLiquid.ProjectSupport))]
 
@@ -44,26 +45,13 @@ namespace NLiquid
 				FullName = "<root>";
 				Kind = "root";
 			};
-			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));
-
-			def defineSymbol[Type](name : string, putToRootScope: bool = true) : Type where Type: DeclarationSymbol
-			{
-        def name = Name(NoLocation, name);
-        def symbol =
-          if (putToRootScope)
-            ExternalDeclaration.[Type](name).DefineSymbol(root.MemberTable)
-          else
-            ExternalDeclaration.[Type](name).DefineSymbol();
-        symbol
-			}
-			def nilSymbol        = defineSymbol.[NilSymbol]("nil");
-			def numberSymbol     = defineSymbol.[NumberSymbol]("number");
-			def boolSymbol       = defineSymbol.[BooleanSymbol]("bool");
-			def stringSymbol     = defineSymbol.[StringSymbol]("string");
-			def objectSymbol     = defineSymbol.[ObjectSymbol]("object");
-			def arraySymbol      = defineSymbol.[ArraySymbol]("array");
-			def dictionarySymbol = defineSymbol.[DictionarySymbol]("dictionary");
-
+			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));			
+      
+			def globalTypes     = NLiquidGlobalTypes(root.MemberTable);
+			def filters         = FilterTypes.Create(root.MemberTable, globalTypes);
+			def predefinedTypes = PredefinedTypes(globalTypes, filters);
+			def context         = NLiquidDependentPropertyEvalContext(predefinedTypes);
+			/*
 			// Filter "round" with no additional parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
 			def round0FunSymbol   = defineSymbol.[FunSymbol]("round");
 			round0FunSymbol.Parameters = ImmutableArray.Create(numberSymbol);
@@ -73,14 +61,13 @@ namespace NLiquid
 			def round2FunSymbol   = defineSymbol.[FunSymbol]("round");
 			round2FunSymbol.Parameters = ImmutableArray.Create(numberSymbol, numberSymbol);
 			round2FunSymbol.Result     = numberSymbol;
-
-			def context = NLiquidDependentPropertyEvalContext(nilSymbol, numberSymbol, boolSymbol, stringSymbol, objectSymbol, arraySymbol, dictionarySymbol,
-																										 round0FunSymbol, round2FunSymbol);
+*/
+			
 
 			ProjectData(context, root)
 		}
 
-		public RefreshProject(cancellationToken : System.Threading.CancellationToken, files : System.Collections.Immutable.ImmutableArray[Nitra.Declarations.FileEvalPropertiesData], data : object) : void
+		public RefreshProject(cancellationToken : CancellationToken, files : ImmutableArray[FileEvalPropertiesData], data : object) : void
 		{
 			def (context, root) = DecomposeData(data);
 			context.CancellationToken = cancellationToken;
@@ -94,24 +81,24 @@ namespace NLiquid
 				when (file.Ast is CompilationUnit as cu)
 					cu.Scope = scope;
 
-			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedSymbols);
+			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedTypes.Symbols);
 			evalHost.EvalProperties(context, "Pass0", 0);
 			evalHost.EvalProperties(context, "Pass1", 1);
 		}
 
-		public DeconstructType(symbol : Nitra.Declarations.DeclarationSymbol, _type : out Nitra.Declarations.TypeSymbol, typeArgs : out System.Collections.Immutable.ImmutableArray[Nitra.Declarations.TypeSymbol]) : bool
+		public DeconstructType(symbol : DeclarationSymbol, _type : out TypeSymbol, typeArgs : out ImmutableArray[TypeSymbol]) : bool
 		{
 			IgnoreParams();
 			false
 		}
 
-		public GetSymbolById(data : object, symbolId : int) : ValueOption[Nitra.Declarations.DeclarationSymbol]
+		public GetSymbolById(data : object, symbolId : int) : ValueOption[DeclarationSymbol]
 		{
 			IgnoreParams();
 			VNone()
 		}
 
-		public VisitGlobalSymbols(data : object, callback : System.Predicate[Nitra.Declarations.DeclarationSymbol]) : void
+		public VisitGlobalSymbols(data : object, callback : Predicate[DeclarationSymbol]) : void
 		{
 			IgnoreParams();
 		}

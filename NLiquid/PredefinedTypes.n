@@ -1,0 +1,38 @@
+﻿using Nemerle;
+using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+using Nitra;
+using Nitra.Declarations;
+
+using NLiquid.Parser;
+using NLiquid.Parser.Ast;
+using NLiquid.Filters;
+
+namespace NLiquid
+{  
+  public class PredefinedTypes
+  {
+    public GlobalTypes: NLiquidGlobalTypes;
+    public Filters: FilterTypes;
+    public Symbols: ImmutableArray[DeclarationSymbol];
+    
+    public this(globalTypes: NLiquidGlobalTypes, filters: FilterTypes)
+    {
+      GlobalTypes = globalTypes;
+      Filters     = filters;
+      
+      def builder = ImmutableArray.CreateBuilder(globalTypes.Types.Length + filters.Filters.Length);
+			builder.AddRange(globalTypes.Types);
+			builder.AddRange(filters.Filters);
+			
+			Symbols = builder.ToImmutableArray();
+    }
+  }
+}
