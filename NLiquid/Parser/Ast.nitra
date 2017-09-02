@@ -226,7 +226,7 @@ namespace NLiquid.Parser.Ast
 		| Boolean    { Type = context.GetGlobalTypes().Boolean;    }
 		| String     { Type = context.GetGlobalTypes().String;     }
 		| Object     { Type = context.GetGlobalTypes().Object;     }
-		| Array      { ElemType : TypeReference; Type = context.GetArraySymbol(ElemType.Type); }
+		| Array      { ElemType : TypeReference; Type = context.GetGlobalTypes().GetArrayType(ElemType.Type); }
 		| Dictionary { Type = context.GetGlobalTypes().Dictionary; }
 	}
 

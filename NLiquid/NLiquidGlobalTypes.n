@@ -19,7 +19,8 @@ namespace NLiquid
   public class NLiquidGlobalTypes
   {    
     public Nil               : NilSymbol;
-		public Number            : NumberSymbol;
+		public Double            : DoubleSymbol;
+		public Int               : IntSymbol;
 		public Boolean           : BooleanSymbol;
 		public String            : StringSymbol;
 		public Object            : ObjectSymbol;
@@ -30,18 +31,25 @@ namespace NLiquid
 		public this(scope: TableScope = null)
 		{
 		  Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
-			Number     = Helpers.DefineSymbol.[NumberSymbol]("number", scope);
+			Double     = Helpers.DefineSymbol.[DoubleSymbol]("double", scope);
+			Int        = Helpers.DefineSymbol.[IntSymbol]("int", scope);
 			Boolean    = Helpers.DefineSymbol.[BooleanSymbol]("bool", scope);
 			String     = Helpers.DefineSymbol.[StringSymbol]("string", scope);
 			Object     = Helpers.DefineSymbol.[ObjectSymbol]("object", scope);
 			Array      = Helpers.DefineSymbol.[ArraySymbol]("array", scope);
 			Dictionary = Helpers.DefineSymbol.[DictionarySymbol]("dictionary", scope);
 			
-			def named   = array[Nil : DeclarationSymbol, Number, Boolean, String, Object, Array, Dictionary];
+			def named   = array[Nil : DeclarationSymbol, Double, Int, Boolean, String, Object, Dictionary];
 			def builder = ImmutableArray.CreateBuilder(named.Length);
 			builder.AddRange(named);
 			
 			Types = builder.MoveToImmutable();
-		}	
+		}
+		
+		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
+		{
+			// TODO: реализовать создание и кэширование массивов с конкретным типом
+			null
+		}
   }
 }

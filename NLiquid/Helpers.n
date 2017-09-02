@@ -35,17 +35,17 @@ namespace NLiquid
 			match (System.Type.GetTypeCode(type))
       {
           | TypeCode.Boolean => globalTypes.Boolean                  
-          | TypeCode.Byte
-          | TypeCode.Decimal
-          | TypeCode.Double
+          | TypeCode.UInt64
+          | TypeCode.Double  => globalTypes.Double
+          | TypeCode.Byte                    
           | TypeCode.Int16
           | TypeCode.Int32
           | TypeCode.Int64
           | TypeCode.SByte
           | TypeCode.Single
           | TypeCode.UInt16
-          | TypeCode.UInt32
-          | TypeCode.UInt64  => globalTypes.Number
+          | TypeCode.UInt32  => globalTypes.Int
+          //| TypeCode.Decimal
           | TypeCode.Empty   => globalTypes.Nil
           | TypeCode.Char
           | TypeCode.String  => globalTypes.String
