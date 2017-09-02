@@ -51,19 +51,7 @@ namespace NLiquid
 			def filters         = FilterTypes.Create(root.MemberTable, globalTypes);
 			def predefinedTypes = PredefinedTypes(globalTypes, filters);
 			def context         = NLiquidDependentPropertyEvalContext(predefinedTypes);
-			/*
-			// Filter "round" with no additional parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-			def round0FunSymbol   = defineSymbol.[FunSymbol]("round");
-			round0FunSymbol.Parameters = ImmutableArray.Create(numberSymbol);
-			round0FunSymbol.Result     = numberSymbol;
-
-			// Filter "round" with additional one parameter. First parameter is a input expression. Example: {{ 1.2 | round }}
-			def round2FunSymbol   = defineSymbol.[FunSymbol]("round");
-			round2FunSymbol.Parameters = ImmutableArray.Create(numberSymbol, numberSymbol);
-			round2FunSymbol.Result     = numberSymbol;
-*/
 			
-
 			ProjectData(context, root)
 		}
 

@@ -23,6 +23,6 @@ namespace NLiquid.Filters
   class FilterFunDeclaration : ExternalDeclaration[DeclarationSymbol]
   {
     public Method : MethodInfo;
-    public override CreateSymbol() : DeclarationSymbol { FunSymbol() }
+    public override CreateSymbol() : DeclarationSymbol { FuncSymbol() }
   }
 } // namespace

@@ -10,18 +10,13 @@ using System.Linq;
 namespace NLiquid.Filters
 {
   [FilterSource]
-  public class NumberFilters
+  public interface NumberFilters
   {
     [Filter("round")]
-		public static Round(val: double): double
-		{
-			Math.Round(val)
-		}
+		Round(val: double): double;
+		
 		
     [Filter("round")]
-		public static Round(val: double, digits: int): double
-		{
-			Math.Round(val, digits)
-		}
+		Round(val: double, digits: int): double;
   }
 }

@@ -199,13 +199,14 @@ namespace NLiquid.Parser.Ast
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call
 		{
-			out Ref : Ref[FunSymbol] = Helpers.ResolveCall(FanName.Ref, Arg0.Type, Args.Type);
+			out Ref : Ref[FuncSymbol] = Helpers.ResolveCall(FuncName.Ref, Arg0.Type, Args.Type);
 
-			FanName.Scope = Scope;
+			FuncName.Scope = Scope;
 			Arg0.Scope    = Scope;
 			Args.Scope    = Scope;
+			Type          = Ref.Symbol.Result;
 
-			FanName : Reference;
+			FuncName : Reference;
 			Arg0    : Expr;
 			Args    : Expr*;
 		}
@@ -259,7 +260,7 @@ namespace NLiquid.Parser.Ast
 			in ElemType : TypeSymbol;
 		}
 	}
-	declaration Fun			: Type
+	declaration Func		: Type
 	{
 		symbol
 		{

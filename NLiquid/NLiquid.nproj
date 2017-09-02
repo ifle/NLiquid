@@ -75,6 +75,9 @@
     </MacroReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Filters\ArrayFilters.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Filters\FilterAttribute.n">
       <SubType>Code</SubType>
     </Compile>
