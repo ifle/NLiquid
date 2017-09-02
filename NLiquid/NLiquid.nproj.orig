@@ -81,10 +81,11 @@
     <Compile Include="Filters\FilterContainerAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Filters\FilterManager.n">
-      <SubType>Code</SubType>
-    </Compile>
+<<<<<<< HEAD
+    <Compile Include="Filters\FilterTypes.n">
+=======
     <Compile Include="Filters\FilterFunDeclaration.n">
+>>>>>>> b8922314283cf89bddf0af1bf5b74859a2686594
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Filters\NumberFilters.n">
@@ -103,9 +104,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Context.n">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Parser\AstUtils.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Parser\Grammar.nitra" />

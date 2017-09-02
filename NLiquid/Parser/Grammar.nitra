@@ -71,10 +71,15 @@ namespace NLiquid.Parser.Syntax
 			| "true"
 			| "false"
 			| [SpanClass(Number)]
-			  Number = Digits
-			  {
-				regex Digits = ("+" | "-")? DecimalDigit+ ("." DecimalDigit+)?;
-			  }
+			  Double = Digits
+			{
+				regex Digits = ("+" | "-")? DecimalDigit+ "." DecimalDigit+;
+			}
+			| [SpanClass(Number)]
+			  Int = Digits
+			{
+				regex Digits = ("+" | "-")? DecimalDigit+;
+			}
 			| Reference
 			| [SpanClass(String)] SStr = "'" Value=(!"'" Any)* "'"
 			| [SpanClass(String)] DStr = '"' Value=(!'"' Any)* '"'

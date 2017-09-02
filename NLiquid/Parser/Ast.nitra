@@ -161,10 +161,15 @@ namespace NLiquid.Parser.Ast
 			Type = context.GetGlobalTypes().Boolean;
 			Value : bool;
 		}
-		| Number
+		| Double
 		{
-			Type = context.GetGlobalTypes().Number;
+			Type = context.GetGlobalTypes().Double;
 			Value : double;
+		}
+		| Int
+		{
+			Type = context.GetGlobalTypes().Int;
+			Value : int;
 		}
 		| SStr
 		{
@@ -216,23 +221,44 @@ namespace NLiquid.Parser.Ast
 		in Type : TypeSymbol;
 
 		| Nil        { Type = context.GetGlobalTypes().Nil;        }
-		| Number     { Type = context.GetGlobalTypes().Number;     }
+		| Double     { Type = context.GetGlobalTypes().Double;     }
+		| Int        { Type = context.GetGlobalTypes().Int;        }
 		| Boolean    { Type = context.GetGlobalTypes().Boolean;    }
 		| String     { Type = context.GetGlobalTypes().String;     }
 		| Object     { Type = context.GetGlobalTypes().Object;     }
-		| Array      { Type = context.GetGlobalTypes().Array;      }
+		| Array      { ElemType : TypeReference; Type = context.GetArraySymbol(ElemType.Type); }
 		| Dictionary { Type = context.GetGlobalTypes().Dictionary; }
 	}
 
 	declaration Root        : Container {}
 
 	declaration Nil         : Type {}
-	declaration Number      : Type {}
+	declaration Int         : Type {}
+	declaration Double      : Type {}
 	declaration Boolean     : Type {}
 	declaration String      : Type {}
-	declaration Object      : Type {}
-	declaration Array       : Type {}
 	declaration Dictionary  : Type {}
+	declaration Property
+	{
+		symbol
+		{
+			in Type : TypeSymbol;
+		}
+	}
+	declaration Object      : Type
+	{
+		symbol
+		{
+			in Properties : ImmutableArray[PropertySymbol];
+		}
+	}
+	declaration Array       : Type
+	{
+		symbol
+		{
+			in ElemType : TypeSymbol;
+		}
+	}
 	declaration Fun			: Type
 	{
 		symbol

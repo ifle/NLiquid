@@ -71,7 +71,8 @@ namespace NLiquid.Parser.Mapping
 	{
 		| True         -> True   { Value = ParsedValue(NSpan(), true); }
 		| False        -> False  { Value = ParsedValue(NSpan(), false); }
-		| Number       -> Number { Value = ParsedValue(Digits, double.Parse(GetText(Digits), CultureInfo.InvariantCulture)); }
+		| Double       -> Double { Value = ParsedValue(Digits, double.Parse(GetText(Digits), CultureInfo.InvariantCulture)); }
+		| Int          -> Int    { Value = ParsedValue(Digits, int.Parse(GetText(Digits))); }
 		| SStr         -> SStr   { Value = ParsedValue(Value, GetText(Value)); }
 		| DStr         -> DStr   { Value = ParsedValue(Value, GetText(Value)); }
 		| Reference    -> LocalVariableRef  { Reference -> Reference; }

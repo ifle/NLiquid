@@ -17,6 +17,40 @@ namespace NLiquid
 {
 	public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
 	{
-		
+		public Nil         : NilSymbol;
+		public Int         : IntSymbol;
+		public Double      : DoubleSymbol;
+		public Boolean     : BooleanSymbol;
+		public String      : StringSymbol;
+		public Object      : ObjectSymbol;
+		public Dictionary  : DictionarySymbol;
+
+		_functions   : array[FunSymbol];
+
+		public this(nil : NilSymbol, @int : IntSymbol, @double : DoubleSymbol, boolean : BooleanSymbol, @string : StringSymbol, @object : ObjectSymbol, dictionary : DictionarySymbol, params functions : array[FunSymbol])
+		{
+			Nil        = nil;
+			Int        = @int;
+			Double     = @double;
+			Boolean    = boolean;
+			String     = @string;
+			Object     = @object;
+			Dictionary = dictionary;
+			_functions = functions;
+
+			def named   = array[nil : DeclarationSymbol, @int, double, boolean, @string, @object, @dictionary];
+			def builder = ImmutableArray.CreateBuilder(named.Length + _functions.Length);
+			builder.AddRange(named);
+			builder.AddRange(_functions);
+			this.PredefinedSymbols = builder.MoveToImmutable();
+		}
+
+		public PredefinedSymbols : ImmutableArray[DeclarationSymbol] { get; }
+
+		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
+		{
+			// TODO: реализовать создание и кэширование массивов с конкретным типом
+			null
+		}
 	}
 }
