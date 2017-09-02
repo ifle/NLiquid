@@ -52,6 +52,18 @@ namespace NLiquid.Parser.Mapping
 		ElseBranch -> Body;
 	}
 
+	map syntax Grammar.FilteredExpr -> Expr
+	{
+		| FilterWithoutArgs   -> Call { FilteredExpr -> Arg0; [] -> Args; Reference -> FuncName; }
+		| FilterWithArgs      ->
+			Call
+			{
+				FilteredExpr -> Arg0;
+				Args.Item1   -> Args;
+				Reference    -> FuncName;
+			}
+	}
+
 	map syntax Grammar.OutputExpr.FilteredExpr -> Expr
 	{
 		FilteredExpr // forwarding value through
@@ -77,22 +89,11 @@ namespace NLiquid.Parser.Mapping
 		| DStr         -> DStr   { Value = ParsedValue(Value, GetText(Value)); }
 		| Reference    -> LocalVariableRef  { Reference -> Reference; }
 		| MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
+		| ArrayAccess  -> ArrayAccess  { Expr -> Index; Reference -> Reference; }
 		| Or           { Expr1 -> Expr1; Expr2 -> Expr2; }
 		| And          { Expr1 -> Expr1; Expr2 -> Expr2; }
 		| Contains     { Expr1 -> Expr1; Expr2 -> Expr2; }
 		| Equal        { Expr1 -> Expr1; Expr2 -> Expr2; }
 		| NotEqual     { Expr1 -> Expr1; Expr2 -> Expr2; }
-	}
-
-	map syntax Grammar.FilteredExpr -> Expr
-	{
-		| FilterWithoutArgs   -> Call { FilteredExpr -> Arg0; [] -> Args; Reference -> FuncName; }
-		| FilterWithArgs      ->
-			Call
-			{
-				FilteredExpr -> Arg0;
-				Args.Item1   -> Args;
-				Reference    -> FuncName;
-			}
 	}
 }

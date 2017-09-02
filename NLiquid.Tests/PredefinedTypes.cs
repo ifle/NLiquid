@@ -67,7 +67,7 @@ namespace NLiquid.Tests
 
 			// Act
 			var predefinedTypes = new PredefinedTypes(globalTypes, filters);
-			
+
 			// Assert	
 			Assert.NotNull(predefinedTypes.GlobalTypes);
 			Assert.NotNull(predefinedTypes.Filters);

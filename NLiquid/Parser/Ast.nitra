@@ -195,6 +195,21 @@ namespace NLiquid.Parser.Ast
 
 			Qualifier : Expr;
 			Reference : Reference;
+			
+		}
+		| ArrayAccess
+		{
+			out Ref: Ref[ArraySymbol] = Reference.Ref.Resolve();
+			Reference.Scope = Scope;
+			Index.Scope = Scope;
+			Index.ExpectedType = context.GetGlobalTypes().Int;			
+			Type = Ref.Symbol.ElemType;
+
+			Reference: Reference;
+			Index: Expr;
+
+			unless (NLiquidTypeUnifier.Instance.TryUnify(Index.Type, Index.ExpectedType))
+				Error(context, $"Expected $(Index.ExpectedType) type of index but got $(Index.Type)");
 		}
 		| Error        { Error(context, "Expected: Expr '}}'"); }
 		| Call
@@ -209,7 +224,7 @@ namespace NLiquid.Parser.Ast
 			FuncName : Reference;
 			Arg0    : Expr;
 			Args    : Expr*;
-		}
+		}		
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}

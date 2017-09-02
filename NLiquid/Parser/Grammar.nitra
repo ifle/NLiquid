@@ -95,6 +95,7 @@ namespace NLiquid.Parser.Syntax
 			| NotEqual     = Expr s sm "!=" s sm Expr
 		precedence Primary:
 			| MemberAccess =  Expr s "." s Reference
+			| ArrayAccess  = Reference s "[" s Expr s "]"
 		}
 
 		syntax FilteredExpr
