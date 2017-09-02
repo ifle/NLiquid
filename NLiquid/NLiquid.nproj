@@ -78,7 +78,7 @@
     <Compile Include="Filters\FilterAttribute.n">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Filters\FilterContainerAttribute.n">
+    <Compile Include="Filters\FilterSourceAttribute.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Filters\FilterFunDeclaration.n">

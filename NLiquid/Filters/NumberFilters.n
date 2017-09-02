@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-  [FilterContainer]
+  [FilterSource]
   public class NumberFilters
   {
     [Filter("round")]

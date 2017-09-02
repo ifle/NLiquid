@@ -33,7 +33,12 @@ namespace NLiquid.Filters
       def filterMethods = LoadFilterMethods();
       
       foreach (filterMethod in filterMethods)
-        builder.Add(CreateFilterSymbol(filterMethod, scope, globalTypes));
+      {
+        def filterSymbol = CreateFilterSymbol(filterMethod, scope, globalTypes);
+        when(filterSymbol != null)
+          builder.Add(filterSymbol);
+      }
+        
       
       def filters = builder.ToImmutable();
       FilterTypes(filters);
@@ -44,7 +49,8 @@ namespace NLiquid.Filters
     {
       def builder = ImmutableArray.CreateBuilder.[MethodInfo]();
       
-      foreach (filterType in Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsClass && type.GetCustomAttribute.[FilterContainerAttribute]() != null))
+      
+      foreach (filterType in Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsClass && type.GetCustomAttributesData().Any(attr => attr.AttributeType == typeof(FilterSourceAttribute))))
 		  foreach (method in filterType.GetMethods(BindingFlags.Public | BindingFlags.Static))
 			{
 				builder.Add(method);			  
@@ -54,18 +60,24 @@ namespace NLiquid.Filters
     }
     
     // create funsymbol from memberinfo of filter
-    static CreateFilterSymbol(method: MethodInfo, scope: TableScope, globalTypes: NLiquidGlobalTypes): FunSymbol
+    static CreateFilterSymbol(methodInfo: MethodInfo, scope: TableScope, globalTypes: NLiquidGlobalTypes): FunSymbol
     {
-      def filterAttribute = method.GetCustomAttribute.[FilterAttribute]();
-      def filterName      = filterAttribute?.Name ?? method.Name;
-      def symbol          = Helpers.DefineSymbol.[FunSymbol](filterName, scope);
-      def parameters      = method.GetParameters().Select(p => Helpers.CreateTypeSymbol(p.ParameterType, globalTypes)).ToImmutableArray();
-      def returnType      = Helpers.CreateTypeSymbol(method.ReturnType, globalTypes);
+      def filterAttribute = methodInfo.GetCustomAttributesData().FirstOrDefault(attr => attr.AttributeType == typeof(FilterAttribute));
+      if(filterAttribute != null)
+      {
+        def filterName      = filterAttribute.ConstructorArguments[0].Value :> string;
+        def symbol          = FilterFunDeclaration(Helpers.CreateName(filterName), methodInfo).DefineSymbol(scope) :> FunSymbol;
+        def parameters      = methodInfo.GetParameters().Select(p => Helpers.CreateTypeSymbol(p.ParameterType, globalTypes)).ToImmutableArray();
+        def returnType      = Helpers.CreateTypeSymbol(methodInfo.ReturnType, globalTypes);
       
-			symbol.Parameters = parameters;
-			symbol.Result     = returnType;
-			
-			symbol;
+			  symbol.Parameters = parameters;
+			  symbol.Result     = returnType;
+			  symbol;
+      }
+      else
+      {
+        null;  
+      }    
     }
   }
 }

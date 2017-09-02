@@ -79,5 +79,10 @@ namespace NLiquid
 			}
 			func.Resolve(resolve)
 		}
+		
+		public CreateName(name: string): Name
+		{
+		  Name(NoLocation, name);
+		}
   }
 }

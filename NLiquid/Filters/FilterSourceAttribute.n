@@ -10,7 +10,8 @@ using System.Linq;
 namespace NLiquid.Filters
 {
 	[Record]
-  public class FilterContainerAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+  public class FilterSourceAttribute : Attribute
   {
   }
 }
