@@ -1,3 +1,0 @@
-﻿{% if user %}
-	Hello {{ user.name }}!
-{% endif %}

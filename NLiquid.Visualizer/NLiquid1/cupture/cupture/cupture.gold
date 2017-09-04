@@ -1,0 +1,11 @@
+{% capture my_variable %}I am being captured.{% endcapture %}
+{{ my_variable }}
+
+{% assign favorite_food = 'pizza' %}
+{% assign age = 35 %}
+
+{% capture about_me %}
+I am {{ age }} and my favorite food is {{ favorite_food }}.
+{% endcapture %}
+
+{{ about_me }}

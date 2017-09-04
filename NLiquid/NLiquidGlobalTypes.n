@@ -29,7 +29,6 @@ namespace NLiquid
 		public Types             : ImmutableArray[DeclarationSymbol];
 
 		_arrayElemTypeMap         : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
-		_arraySymbolMap           : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
 		_scope                    : TableScope;
 
 		public this(scope: TableScope = null)
@@ -59,7 +58,6 @@ namespace NLiquid
 			  arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
 			  arraySymbol.ElemType = elemType;
 			  _arrayElemTypeMap.Add(elemType, arraySymbol);
-			  _arraySymbolMap.Add(arraySymbol, arraySymbol);
 			}
 			arraySymbol
 		}
