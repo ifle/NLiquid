@@ -243,9 +243,9 @@ namespace NLiquid.Parser.Ast
 			To		: Expr;
 
 			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, To.Type))
-				From.Error(context, $"$(self.From.Type) is not compatible with $(self.To.Type).");
+				From.Error(context, $"$(From.Type) is not compatible with $(To.Type).");
 			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, context.GetGlobalTypes().Int))
-				Expr1.Error(context, $"Expected string expression but found $(self.From.Type).");
+				From.Error(context, $"Expected int expression but found $(From.Type).");
 		}
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}

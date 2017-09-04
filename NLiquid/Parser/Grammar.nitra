@@ -73,7 +73,7 @@ namespace NLiquid.Parser.Syntax
 		syntax ForSourceExpr
 		{
 			| FilteredExpr
-			| Range
+			| Range = OpenBrace s sm From=Expr s sm ".." s sm To=Expr s sm CloseBrace;
 		}
 
 		syntax Expr
@@ -115,8 +115,6 @@ namespace NLiquid.Parser.Syntax
 			| FilterWithoutArgs = FilteredExpr s sm "|" s sm Reference
 			| FilterWithArgs    = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
 		}
-
-		syntax Range = OpenBrace s sm Expr s sm ".." s sm Expr s sm CloseBrace;
 	}
 }
 

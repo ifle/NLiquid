@@ -86,9 +86,16 @@ namespace NLiquid.Parser.Mapping
 	{
 		Expr // forwarding value through
 	}
+
 	map syntax Grammar.ForSourceExpr -> Expr
 	{
-		ForSourceExpr
+		| FilteredExpr
+		| Range -> Range { From -> From; To -> To; }
+	}
+
+	map syntax Grammar.OutputExpr.FilteredExpr -> Expr
+	{
+		FilteredExpr // forwarding value through
 	}
 
 	map syntax Grammar.Expr -> Expr
