@@ -23,22 +23,22 @@ namespace NLiquid
     public static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
     public static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
     public static NoSpan : NSpan              = NSpan(0);
-    
+
     public static DefineSymbol[Type](name : string, scope: TableScope = null) : Type where Type: DeclarationSymbol
 		{
       def name = Name(NoLocation, name);
-      def symbol = ExternalDeclaration.[Type](name).DefineSymbol(scope);          
+      def symbol = ExternalDeclaration.[Type](name).DefineSymbol(scope);
       symbol
 		}
-		
+
 		public static CreateTypeSymbol(type: System.Type, globalTypes: NLiquidGlobalTypes) : TypeSymbol
 		{
 			match (System.Type.GetTypeCode(type))
       {
-          | TypeCode.Boolean => globalTypes.Boolean                  
+          | TypeCode.Boolean => globalTypes.Boolean
           | TypeCode.UInt64
           | TypeCode.Double  => globalTypes.Double
-          | TypeCode.Byte                    
+          | TypeCode.Byte
           | TypeCode.Int16
           | TypeCode.Int32
           | TypeCode.Int64
@@ -50,7 +50,7 @@ namespace NLiquid
           | TypeCode.Empty   => globalTypes.Nil
           | TypeCode.Char
           | TypeCode.String  => globalTypes.String
-          | TypeCode.Object  => 
+          | TypeCode.Object  =>
           {
             if(typeof(IEnumerable).IsAssignableFrom(type))
             {
@@ -69,18 +69,17 @@ namespace NLiquid
               globalTypes.Object;
             }
           }
-          
+
           //| TypeCode.DateTime
-                    
           | _                => throw InvalidOperationException()
-                    
-      }            
+
+      }
 		}
-		
+
 		public GetGlobalTypes(this ctx: DependentPropertyEvalContext): NLiquidGlobalTypes
 		{
 			(ctx :> NLiquidDependentPropertyEvalContext).PredefinedTypes.GlobalTypes;
-		}		
+		}
 
 		public ResolveCall(func : Ref[DeclarationSymbol], arg0Type : TypeSymbol, argsTypes : ImmutableArray[TypeSymbol]) : Ref[FuncSymbol]
 		{

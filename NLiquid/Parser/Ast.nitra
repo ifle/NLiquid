@@ -195,15 +195,15 @@ namespace NLiquid.Parser.Ast
 
 			Qualifier : Expr;
 			Reference : Reference;
-			
+
 		}
 		| ArrayAccess
 		{
-			out Ref: Ref[ArraySymbol] = Reference.Ref.Resolve();
+			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
 			Reference.Scope = Scope;
 			Index.Scope = Scope;
-			Index.ExpectedType = context.GetGlobalTypes().Int;			
-			Type = Ref.Symbol.ElemType;
+			Index.ExpectedType = context.GetGlobalTypes().Int;
+			//Type = (Ref.Symbol.Type :> ArraySymbol).ElemType;
 
 			Reference: Reference;
 			Index: Expr;

@@ -17,7 +17,7 @@ using NLiquid.Parser.Ast;
 namespace NLiquid
 {
   public class NLiquidGlobalTypes
-  {    
+  {
     public Nil               : NilSymbol;
 		public Double            : DoubleSymbol;
 		public Int               : IntSymbol;
@@ -27,10 +27,10 @@ namespace NLiquid
 		public Array             : ArraySymbol;
 		public Dictionary        : DictionarySymbol;
 		public Types             : ImmutableArray[DeclarationSymbol];
-		
+
 		_dictionary               : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
 		_scope                    : TableScope;
-		
+
 		public this(scope: TableScope = null)
 		{
 		  _scope     = scope;
@@ -42,20 +42,21 @@ namespace NLiquid
 			Object     = Helpers.DefineSymbol.[ObjectSymbol]("object", scope);
 			Array      = Helpers.DefineSymbol.[ArraySymbol]("array", scope);
 			Dictionary = Helpers.DefineSymbol.[DictionarySymbol]("dictionary", scope);
-			
+
 			def named   = array[Nil : DeclarationSymbol, Double, Int, Boolean, String, Object, Dictionary];
 			def builder = ImmutableArray.CreateBuilder(named.Length);
 			builder.AddRange(named);
-			
+
 			Types = builder.MoveToImmutable();
 		}
-		
+
 		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
 		{
 			mutable arraySymbol;
 		  when(!_dictionary.TryGetValue(elemType, out arraySymbol))
 			{
 			  arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
+			  arraySymbol.ElemType = elemType;
 			  _dictionary.Add(elemType, arraySymbol);
 			}
 			arraySymbol
