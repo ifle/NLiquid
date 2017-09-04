@@ -33,11 +33,19 @@ namespace NLiquid.Parser.Mapping
 		}
 		| Assignment -> LocalVariable.SimpleLocalVariable
 		{
-				Name -> Name; FilteredExpr -> Initializer;
+			Name -> Name;
+			FilteredExpr -> Initializer;
 		}
 		| Capture -> LocalVariable.CaptureLocalVariable
 		{
-			Name -> Name; Body -> Body;
+			Name -> Name;
+			Body -> Body;
+		}
+		| For -> LocalVariable.For
+		{
+			Name -> Name;
+			FilteredExpr -> ForSource;
+			Body -> Body;
 		}
 	}
 

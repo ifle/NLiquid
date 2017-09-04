@@ -1,3 +1,4 @@
 {% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
-
-{{ beatles[0] }}
+{% if beatles[0] == "John" %}
+    {{ beatles[0] }}
+{% endif %}    

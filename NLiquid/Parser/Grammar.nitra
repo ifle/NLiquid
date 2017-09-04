@@ -49,6 +49,7 @@ namespace NLiquid.Parser.Syntax
 				OpenTag s sm "endif" s sm CloseTag
 
 			| Unless      = OpenTag s sm "unless" s sm  Expr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endunless" s sm CloseTag
+			| For         = OpenTag s sm "for"    s sm  Name s sm "in" s sm FilteredExpr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endfor" s sm CloseTag
 			| Output      = OpenOutput s sm OutputExpr s sm  CloseOutput
 			| Assignment  = OpenTag s sm "assign" s sm Name s sm "=" s sm FilteredExpr s CloseTag
 			| Capture     = OpenTag s sm "capture" s sm  Name s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endcapture" s sm CloseTag

@@ -35,7 +35,7 @@ namespace NLiquid.Parser.Ast
 			Expr : Expr;
 		 }
 		| If : LocalVariableScope
-		 {
+		{
 			CurrentTable         = LocalVariables;
 			// протаскиваем текущую таблицу имен во вложенные блоки
 			Body.CurrentTable    = CurrentTable;
@@ -50,7 +50,7 @@ namespace NLiquid.Parser.Ast
 			Body      : Statement*;
 			ElseIfs   : ElseIf*;
 			Else      : Else?;
-		 }
+		}
 		| Unless : LocalVariableScope
 		{
 			CurrentTable      = LocalVariables;
@@ -108,6 +108,16 @@ namespace NLiquid.Parser.Ast
 
 			  Body: Statement*;
 		  }
+		| For
+		{
+			Symbol.Kind       	= "for";
+			Symbol.Type       	= context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
+			ForSource.Scope     = Scope;
+			Body.Scope          = Scope;
+
+			ForSource : Expr;
+			Body	  : Statement*;
+		}
 	}
 
 	abstract ast Binary : Expr
@@ -203,7 +213,7 @@ namespace NLiquid.Parser.Ast
 			Reference.Scope = Scope;
 			Index.Scope = Scope;
 			Index.ExpectedType = context.GetGlobalTypes().Int;
-			//Type = (Ref.Symbol.Type :> ArraySymbol).ElemType;
+			Type = context.GetGlobalTypes().GetArrayElemType(Ref.Symbol.Type);
 
 			Reference: Reference;
 			Index: Expr;

@@ -28,13 +28,14 @@ namespace NLiquid
 		public Dictionary        : DictionarySymbol;
 		public Types             : ImmutableArray[DeclarationSymbol];
 
-		_dictionary               : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
+		_arrayElemTypeMap         : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
+		_arraySymbolMap           : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
 		_scope                    : TableScope;
 
 		public this(scope: TableScope = null)
 		{
-		  _scope     = scope;
-		  Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
+		    _scope     = scope;
+		    Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
 			Double     = Helpers.DefineSymbol.[DoubleSymbol]("double", scope);
 			Int        = Helpers.DefineSymbol.[IntSymbol]("int", scope);
 			Boolean    = Helpers.DefineSymbol.[BooleanSymbol]("bool", scope);
@@ -52,14 +53,24 @@ namespace NLiquid
 
 		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
 		{
-			mutable arraySymbol;
-		  when(!_dictionary.TryGetValue(elemType, out arraySymbol))
+          mutable arraySymbol;
+		  when(!_arrayElemTypeMap.TryGetValue(elemType, out arraySymbol))
 			{
 			  arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
 			  arraySymbol.ElemType = elemType;
-			  _dictionary.Add(elemType, arraySymbol);
+			  _arrayElemTypeMap.Add(elemType, arraySymbol);
+			  _arraySymbolMap.Add(arraySymbol, arraySymbol);
 			}
 			arraySymbol
+		}
+
+		public GetArrayElemType(arrayType : TypeSymbol) : TypeSymbol
+		{
+            match(arrayType)
+            {
+                | ArraySymbol as arr => arr.ElemType
+                | _ => Nil
+            }
 		}
   }
 }
