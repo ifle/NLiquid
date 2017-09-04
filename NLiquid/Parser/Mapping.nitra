@@ -44,7 +44,7 @@ namespace NLiquid.Parser.Mapping
 		| For -> LocalVariable.For
 		{
 			Name -> Name;
-			FilteredExpr -> ForSource;
+			ForSourceExpr -> ForSource;
 			Body -> Body;
 		}
 	}
@@ -85,6 +85,10 @@ namespace NLiquid.Parser.Mapping
 	map syntax Grammar.FilteredExpr.Expr -> Expr
 	{
 		Expr // forwarding value through
+	}
+	map syntax Grammar.ForSourceExpr -> Expr
+	{
+		ForSourceExpr
 	}
 
 	map syntax Grammar.Expr -> Expr

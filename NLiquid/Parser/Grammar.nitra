@@ -14,6 +14,9 @@ namespace NLiquid.Parser.Syntax
 		[SpanClass(OpenBrace)]  regex OpenOutput  = "{{";
 		[SpanClass(CloseBrace)] regex CloseOutput = "}}";
 
+		[SpanClass(OpenBrace)]  regex OpenBrace  = "(";
+		[SpanClass(CloseBrace)] regex CloseBrace = ")";
+
 		keyword regex ['a'..'z', '_']+ rule S;
 		regex DecimalDigit = ['0'..'9'];
 		regex Keyword      = "true" | "false";
@@ -49,7 +52,7 @@ namespace NLiquid.Parser.Syntax
 				OpenTag s sm "endif" s sm CloseTag
 
 			| Unless      = OpenTag s sm "unless" s sm  Expr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endunless" s sm CloseTag
-			| For         = OpenTag s sm "for"    s sm  Name s sm "in" s sm FilteredExpr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endfor" s sm CloseTag
+			| For         = OpenTag s sm "for"    s sm  Name s sm "in" s sm ForSourceExpr s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endfor" s sm CloseTag
 			| Output      = OpenOutput s sm OutputExpr s sm  CloseOutput
 			| Assignment  = OpenTag s sm "assign" s sm Name s sm "=" s sm FilteredExpr s CloseTag
 			| Capture     = OpenTag s sm "capture" s sm  Name s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endcapture" s sm CloseTag
@@ -65,6 +68,12 @@ namespace NLiquid.Parser.Syntax
 		{
 			| FilteredExpr
 			| Error = !(FilteredExpr s "}}") (!"}}" Any)+
+		}
+
+		syntax ForSourceExpr
+		{
+			| FilteredExpr
+			| Range
 		}
 
 		syntax Expr
@@ -106,6 +115,8 @@ namespace NLiquid.Parser.Syntax
 			| FilterWithoutArgs = FilteredExpr s sm "|" s sm Reference
 			| FilterWithArgs    = FilteredExpr s sm "|" s sm Reference s ":" s sm Args=(Expr; s "," s sm; ?)*
 		}
+
+		syntax Range = OpenBrace s sm Expr s sm ".." s sm Expr s sm CloseBrace;
 	}
 }
 

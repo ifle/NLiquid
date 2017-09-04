@@ -227,14 +227,26 @@ namespace NLiquid.Parser.Ast
 			out Ref : Ref[FuncSymbol] = Helpers.ResolveCall(FuncName.Ref, Arg0.Type, Args.Type);
 
 			FuncName.Scope = Scope;
-			Arg0.Scope    = Scope;
-			Args.Scope    = Scope;
-			Type          = Ref.Symbol.Result;
+			Arg0.Scope     = Scope;
+			Args.Scope     = Scope;
+			Type           = Ref.Symbol.Result;
 
 			FuncName : Reference;
 			Arg0    : Expr;
 			Args    : Expr*;
-		}		
+		}
+		| Range
+		{
+			Type          = context.GetGlobalTypes().GetArrayType(context.GetGlobalTypes().Int);
+
+			From	: Expr;
+			To		: Expr;
+
+			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, To.Type))
+				From.Error(context, $"$(self.From.Type) is not compatible with $(self.To.Type).");
+			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, context.GetGlobalTypes().Int))
+				Expr1.Error(context, $"Expected string expression but found $(self.From.Type).");
+		}
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}
