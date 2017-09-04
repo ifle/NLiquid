@@ -11,7 +11,7 @@ namespace NLiquid.Filters
 {
 	[Record]
 	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-  public class FilterAttribute: Attribute
+	public class FilterAttribute: Attribute
 	{
 		public Name : string { get; }
 	}

@@ -11,7 +11,7 @@ namespace NLiquid.Filters
 {
 	[Record]
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-  public class FilterSourceAttribute : Attribute
-  {
-  }
+	public class FilterSourceAttribute : Attribute
+	{
+	}
 }

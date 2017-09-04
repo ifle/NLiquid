@@ -18,62 +18,62 @@ using NLiquid.Parser.Ast;
 
 namespace NLiquid
 {
-  public module Helpers
-  {
-    public static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
-    public static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
-    public static NoSpan : NSpan              = NSpan(0);
+	public module Helpers
+	{
+		public static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
+		public static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
+		public static NoSpan : NSpan              = NSpan(0);
 
-    public static DefineSymbol[Type](name : string, scope: TableScope = null) : Type where Type: DeclarationSymbol
+		public static DefineSymbol[Type](name : string, scope: TableScope = null) : Type where Type: DeclarationSymbol
 		{
-      def name = Name(NoLocation, name);
-      def symbol = ExternalDeclaration.[Type](name).DefineSymbol(scope);
-      symbol
+			def name = Name(NoLocation, name);
+			def symbol = ExternalDeclaration.[Type](name).DefineSymbol(scope);
+			symbol
 		}
 
 		public static CreateTypeSymbol(type: System.Type, globalTypes: NLiquidGlobalTypes) : TypeSymbol
 		{
 			match (System.Type.GetTypeCode(type))
-      {
-          | TypeCode.Boolean => globalTypes.Boolean
-          | TypeCode.UInt64
-          | TypeCode.Double  => globalTypes.Double
-          | TypeCode.Byte
-          | TypeCode.Int16
-          | TypeCode.Int32
-          | TypeCode.Int64
-          | TypeCode.SByte
-          | TypeCode.Single
-          | TypeCode.UInt16
-          | TypeCode.UInt32  => globalTypes.Int
-          //| TypeCode.Decimal
-          | TypeCode.Empty   => globalTypes.Nil
-          | TypeCode.Char
-          | TypeCode.String  => globalTypes.String
-          | TypeCode.Object  =>
-          {
-            if(typeof(IEnumerable).IsAssignableFrom(type))
-            {
-              def itemType = if(type.IsGenericType) type.GenericTypeArguments[0] else type.GetElementType();
-              if(itemType != null)
-              {
-                def arrayItemType = CreateTypeSymbol(itemType, globalTypes);
-                def arrayType = globalTypes.GetArrayType(arrayItemType);
-                arrayType;
-              }
-              else
-                globalTypes.Object;
-            }
-            else
-            {
-              globalTypes.Object;
-            }
-          }
+			{
+					| TypeCode.Boolean => globalTypes.Boolean
+					| TypeCode.UInt64
+					| TypeCode.Double  => globalTypes.Double
+					| TypeCode.Byte
+					| TypeCode.Int16
+					| TypeCode.Int32
+					| TypeCode.Int64
+					| TypeCode.SByte
+					| TypeCode.Single
+					| TypeCode.UInt16
+					| TypeCode.UInt32  => globalTypes.Int
+					//| TypeCode.Decimal
+					| TypeCode.Empty   => globalTypes.Nil
+					| TypeCode.Char
+					| TypeCode.String  => globalTypes.String
+					| TypeCode.Object  =>
+					{
+						if(typeof(IEnumerable).IsAssignableFrom(type))
+						{
+							def itemType = if(type.IsGenericType) type.GenericTypeArguments[0] else type.GetElementType();
+							if(itemType != null)
+							{
+								def arrayItemType = CreateTypeSymbol(itemType, globalTypes);
+								def arrayType = globalTypes.GetArrayType(arrayItemType);
+								arrayType;
+							}
+							else
+								globalTypes.Object;
+						}
+						else
+						{
+							globalTypes.Object;
+						}
+					}
 
-          //| TypeCode.DateTime
-          | _                => throw InvalidOperationException()
+					//| TypeCode.DateTime
+					| _                => throw InvalidOperationException()
 
-      }
+			}
 		}
 
 		public GetGlobalTypes(this ctx: DependentPropertyEvalContext): NLiquidGlobalTypes
@@ -101,7 +101,7 @@ namespace NLiquid
 		
 		public CreateName(name: string): Name
 		{
-		  Name(NoLocation, name);
+			Name(NoLocation, name);
 		}
-  }
+	}
 }

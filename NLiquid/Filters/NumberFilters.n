@@ -9,14 +9,13 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-  [FilterSource]
-  public interface NumberFilters
-  {
-    [Filter("round")]
+	[FilterSource]
+	public interface NumberFilters
+	{
+		[Filter("round")]
 		Round(val: double): double;
-		
-		
-    [Filter("round")]
+
+		[Filter("round")]
 		Round(val: double, digits: int): double;
-  }
+	}
 }

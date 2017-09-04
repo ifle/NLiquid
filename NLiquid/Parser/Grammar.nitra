@@ -8,6 +8,8 @@ namespace NLiquid.Parser.Syntax
 		using Nitra.CStyleComments;
 		using Nitra.Identifiers;
 
+		keyword regex ['a'..'z', '_']+ rule S;
+
 		[SpanClass(OpenBrace)]  regex OpenTag  = "{%";
 		[SpanClass(CloseBrace)] regex CloseTag = "%}";
 
@@ -17,12 +19,12 @@ namespace NLiquid.Parser.Syntax
 		[SpanClass(OpenBrace)]  regex OpenBrace  = "(";
 		[SpanClass(CloseBrace)] regex CloseBrace = ")";
 
-		keyword regex ['a'..'z', '_']+ rule S;
-		regex DecimalDigit = ['0'..'9'];
-		regex Keyword      = "true" | "false";
+		regex DecimalDigit  = ['0'..'9'];
+		regex DecimalDigits = DecimalDigit+;
+		regex Keyword       = "true" | "false";
 
-		token Reference    = !Keyword IdentifierBody;
-		token Name         = !Keyword IdentifierBody;
+		token Reference = !Keyword IdentifierBody;
+		token Name      = !Keyword IdentifierBody;
 		[SpanClass(String)]
 		token StringSingleQuoteLiteral = "'" Value=(!"'" Any)* "'";
 		[SpanClass(String)]
@@ -72,7 +74,15 @@ namespace NLiquid.Parser.Syntax
 
 		syntax ForSourceExpr
 		{
-			| FilteredExpr
+			| Expr  = Expr s sm Attribute*
+			{
+				syntax Attribute
+				{
+					| "limit"  s sm ":" s sm DecimalDigits
+					| "offset" s sm ":" s sm DecimalDigits
+					| "reversed"
+				}
+			}
 			| Range = OpenBrace s sm From=Expr s sm ".." s sm To=Expr s sm CloseBrace;
 		}
 
@@ -83,12 +93,12 @@ namespace NLiquid.Parser.Syntax
 			| [SpanClass(Number)]
 			  Double = Digits
 			{
-				regex Digits = ("+" | "-")? DecimalDigit+ "." DecimalDigit+;
+				regex Digits = ("+" | "-")? DecimalDigits "." DecimalDigits;
 			}
 			| [SpanClass(Number)]
 			  Int = Digits
 			{
-				regex Digits = ("+" | "-")? DecimalDigit+;
+				regex Digits = ("+" | "-")? DecimalDigits;
 			}
 			| Reference
 			| [SpanClass(String)] SStr = "'" Value=(!"'" Any)* "'"
