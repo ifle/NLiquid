@@ -72,11 +72,6 @@ namespace NLiquid.Parser.Mapping
 			}
 	}
 
-	map syntax Grammar.OutputExpr.FilteredExpr -> Expr
-	{
-		FilteredExpr // forwarding value through
-	}
-
 	map syntax Grammar.OutputExpr -> Expr
 	{
 		| Error -> Error { }
@@ -87,9 +82,43 @@ namespace NLiquid.Parser.Mapping
 		Expr // forwarding value through
 	}
 
+	map syntax Grammar.ForSourceExpr.AttributedExpr.AttributedExpr.Expr -> Expr
+	{
+		Expr
+	}
+
+	map syntax Grammar.ForSourceExpr.AttributedExpr -> Expr
+	{
+		AttributedExpr
+	}
+
+	map syntax Grammar.ForSourceExpr.AttributedExpr.AttributedExpr -> Expr
+	{
+		| Limit ->
+			Call
+			{
+				AttributedExpr -> Arg0;
+				[Expr]         -> Args;
+				FuncName = Reference(Location(this.Location.Source, KwLimit), "limit");
+			}
+		| Offset ->
+			Call
+			{
+				AttributedExpr -> Arg0;
+				[Expr]         -> Args;
+				FuncName = Reference(Location(this.Location.Source, KwOffset), "offset");
+			}
+		| Reversed ->
+			Call
+			{
+				AttributedExpr -> Arg0;
+				[]         -> Args;
+				FuncName = Reference(Location(this.Location.Source, KwReversed), "reversed");
+			}
+	}
+
 	map syntax Grammar.ForSourceExpr -> Expr
 	{
-		| FilteredExpr
 		| Range -> Range { From -> From; To -> To; }
 	}
 
