@@ -100,8 +100,8 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Expr -> Expr
 	{
-		| True         -> True   { Value = ParsedValue(NSpan(), true); }
-		| False        -> False  { Value = ParsedValue(NSpan(), false); }
+		| True         -> True   { Value = ParsedValue(KwTrue, true); }
+		| False        -> False  { Value = ParsedValue(KwFalse, false); }
 		| Double       -> Double { Value = ParsedValue(Digits, double.Parse(GetText(Digits), CultureInfo.InvariantCulture)); }
 		| Int          -> Int    { Value = ParsedValue(Digits, int.Parse(GetText(Digits))); }
 		| SStr         -> SStr   { Value = ParsedValue(Value, GetText(Value)); }
