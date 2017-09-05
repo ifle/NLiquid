@@ -1,4 +1,13 @@
 {% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
-{% for name in beatles %}
+{% for name in beatles reversed limit : 2 %}
     {{ name }}
+{% endfor %}
+
+{% for i in (3..5) %}
+  {{ i }}
+{% endfor %}
+
+{% assign num = 4 %}
+{% for i in (1..num) %}
+  {{ i }}
 {% endfor %}

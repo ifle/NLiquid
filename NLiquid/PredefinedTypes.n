@@ -17,22 +17,22 @@ using NLiquid.Filters;
 
 namespace NLiquid
 {  
-  public class PredefinedTypes
-  {
-    public GlobalTypes: NLiquidGlobalTypes;
-    public Filters: FilterTypes;
-    public Symbols: ImmutableArray[DeclarationSymbol];
-    
-    public this(globalTypes: NLiquidGlobalTypes, filters: FilterTypes)
-    {
-      GlobalTypes = globalTypes;
-      Filters     = filters;
-      
-      def builder = ImmutableArray.CreateBuilder(globalTypes.Types.Length + filters.Filters.Length);
+	public class PredefinedTypes
+	{
+		public GlobalTypes: NLiquidGlobalTypes;
+		public Filters: FilterTypes;
+		public Symbols: ImmutableArray[DeclarationSymbol];
+		
+		public this(globalTypes: NLiquidGlobalTypes, filters: FilterTypes)
+		{
+			GlobalTypes = globalTypes;
+			Filters     = filters;
+			
+			def builder = ImmutableArray.CreateBuilder(globalTypes.Types.Length + filters.Filters.Length);
 			builder.AddRange(globalTypes.Types);
 			builder.AddRange(filters.Filters);
 			
 			Symbols = builder.ToImmutableArray();
-    }
-  }
+		}
+	}
 }

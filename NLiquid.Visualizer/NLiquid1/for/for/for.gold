@@ -1,4 +1,0 @@
-{% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
-{% for name in beatles %}
-    {{ name }}
-{% endfor %}

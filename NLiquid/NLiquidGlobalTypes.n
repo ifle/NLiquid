@@ -16,9 +16,9 @@ using NLiquid.Parser.Ast;
 
 namespace NLiquid
 {
-  public class NLiquidGlobalTypes
-  {
-    public Nil               : NilSymbol;
+	public class NLiquidGlobalTypes
+	{
+		public Nil               : NilSymbol;
 		public Double            : DoubleSymbol;
 		public Int               : IntSymbol;
 		public Boolean           : BooleanSymbol;
@@ -33,8 +33,8 @@ namespace NLiquid
 
 		public this(scope: TableScope = null)
 		{
-		    _scope     = scope;
-		    Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
+			_scope     = scope;
+			Nil        = Helpers.DefineSymbol.[NilSymbol]("nil", scope);
 			Double     = Helpers.DefineSymbol.[DoubleSymbol]("double", scope);
 			Int        = Helpers.DefineSymbol.[IntSymbol]("int", scope);
 			Boolean    = Helpers.DefineSymbol.[BooleanSymbol]("bool", scope);
@@ -52,23 +52,23 @@ namespace NLiquid
 
 		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
 		{
-          mutable arraySymbol;
-		  when(!_arrayElemTypeMap.TryGetValue(elemType, out arraySymbol))
+					mutable arraySymbol;
+			when(!_arrayElemTypeMap.TryGetValue(elemType, out arraySymbol))
 			{
-			  arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
-			  arraySymbol.ElemType = elemType;
-			  _arrayElemTypeMap.Add(elemType, arraySymbol);
+				arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
+				arraySymbol.ElemType = elemType;
+				_arrayElemTypeMap.Add(elemType, arraySymbol);
 			}
 			arraySymbol
 		}
 
 		public GetArrayElemType(arrayType : TypeSymbol) : TypeSymbol
 		{
-            match(arrayType)
-            {
-                | ArraySymbol as arr => arr.ElemType
-                | _ => Nil
-            }
+						match(arrayType)
+						{
+								| ArraySymbol as arr => arr.ElemType
+								| _ => Nil
+						}
 		}
-  }
+	}
 }

@@ -87,36 +87,39 @@ namespace NLiquid.Parser.Ast
 	{
 		symbol
 		{
-			in Type: TypeSymbol;
+			in Type : TypeSymbol;
 		}
 
-		ContainingTable   = CurrentTable;
-
 		| SimpleLocalVariable
-		  {
+		{
+			ContainingTable   = CurrentTable;
 			  Symbol.Kind       = "assigment";
 			  Symbol.Type       = Initializer.Type;
 			  Initializer.Scope = Scope;
 
 			  Initializer : Expr;
-		  }
+		}
 		| CaptureLocalVariable
-		  {
-			  Symbol.Kind       = "capture";
-			  Symbol.Type       = context.GetGlobalTypes().String;
-			  Body.Scope        = Scope;
-
-			  Body: Statement*;
-		  }
-		| For
 		{
-			Symbol.Kind       	= "for";
-			Symbol.Type       	= context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
+			ContainingTable   = CurrentTable;
+			Symbol.Kind       = "capture";
+			Symbol.Type       = context.GetGlobalTypes().String;
+			Body.Scope        = Scope;
+
+			Body: Statement*;
+		}
+		| For : LocalVariableScope
+		{
+			Symbol.Kind         = "for";
+			Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
 			ForSource.Scope     = Scope;
-			Body.Scope          = Scope;
+			Body.Scope          = Scope.HideWith(LocalVariables);
+			ContainingTable     = LocalVariables;
+			CurrentTable        = LocalVariables;
+			Body.CurrentTable   = CurrentTable;
 
 			ForSource : Expr;
-			Body	  : Statement*;
+			Body      : Statement*;
 		}
 	}
 
@@ -227,14 +230,29 @@ namespace NLiquid.Parser.Ast
 			out Ref : Ref[FuncSymbol] = Helpers.ResolveCall(FuncName.Ref, Arg0.Type, Args.Type);
 
 			FuncName.Scope = Scope;
-			Arg0.Scope    = Scope;
-			Args.Scope    = Scope;
-			Type          = Ref.Symbol.Result;
+			Arg0.Scope     = Scope;
+			Args.Scope     = Scope;
+			Type           = Ref.Symbol.Result;
 
 			FuncName : Reference;
 			Arg0    : Expr;
 			Args    : Expr*;
-		}		
+		}
+		| Range
+		{
+			Type          = context.GetGlobalTypes().GetArrayType(context.GetGlobalTypes().Int);
+
+			From : Expr;
+			To   : Expr;
+
+			From.Scope = Scope;
+			To.Scope   = Scope;
+
+			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, To.Type))
+				From.Error(context, $"$(From.Type) is not compatible with $(To.Type).");
+			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, context.GetGlobalTypes().Int))
+				From.Error(context, $"Expected int expression but found $(From.Type).");
+		}
 		| Or           : OrAndExpr {}
 		| And          : OrAndExpr {}
 		| Contains     : ContainsExpr {}
