@@ -74,18 +74,17 @@ namespace NLiquid.Parser.Syntax
 
 		syntax ForSourceExpr
 		{
-			| AttributedExpr
-			{
-				syntax AttributedExpr
-				{
-					| Expr
-		precedence Attributes:
-					| Limit    = AttributedExpr s sm "limit"  s sm ":" s sm Expr
-					| Offset   = AttributedExpr s sm "offset" s sm ":" s sm Expr
-					| Reversed = AttributedExpr s sm "reversed"
-				}
-			}
+			| Expr = AttributedExpr
 			| Range = OpenBrace s sm From=Expr s sm ".." s sm To=Expr s sm CloseBrace;
+		}
+
+		syntax AttributedExpr
+		{
+			| Expr
+		precedence Attributes:
+			| Limit    = AttributedExpr s sm "limit"  s sm ":" s sm Expr
+			| Offset   = AttributedExpr s sm "offset" s sm ":" s sm Expr
+			| Reversed = AttributedExpr s sm "reversed"
 		}
 
 		syntax Expr

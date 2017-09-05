@@ -1,5 +1,5 @@
 {% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
-{% for name in beatles %}
+{% for name in beatles reversed limit : 2 %}
     {{ name }}
 {% endfor %}
 

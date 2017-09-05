@@ -82,17 +82,17 @@ namespace NLiquid.Parser.Mapping
 		Expr // forwarding value through
 	}
 
-	map syntax Grammar.ForSourceExpr.AttributedExpr.AttributedExpr.Expr -> Expr
+	map syntax Grammar.AttributedExpr.Expr -> Expr
 	{
 		Expr
 	}
 
-	map syntax Grammar.ForSourceExpr.AttributedExpr -> Expr
+	map syntax Grammar.ForSourceExpr.Expr -> Expr
 	{
 		AttributedExpr
 	}
 
-	map syntax Grammar.ForSourceExpr.AttributedExpr.AttributedExpr -> Expr
+	map syntax Grammar.AttributedExpr -> Expr
 	{
 		| Limit ->
 			Call
