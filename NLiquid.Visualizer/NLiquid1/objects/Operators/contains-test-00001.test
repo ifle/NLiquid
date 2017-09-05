@@ -1,4 +1,0 @@
-﻿
-{% if product.tags contains 'Hello' %}
-	This product has been tagged with 'Hello'.
-{% endif %}
