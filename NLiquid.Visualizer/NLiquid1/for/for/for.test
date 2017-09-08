@@ -11,3 +11,20 @@
 {% for i in (1..num) %}
   {{ i }}
 {% endfor %}
+
+{% for i in (3..5) %}
+  {% if i == 2 %}
+    {{ i }}
+  {% elsif i == 23 %}
+    {% break %}
+  {% endif %}
+  {% for name in beatles reversed limit : 2 %}
+    {% if name == "George" %}
+      {% break %}
+    {% endif%}
+  {% endfor %}
+  {% continue %}
+{% endfor %}
+
+{% break %}
+{% continue %}

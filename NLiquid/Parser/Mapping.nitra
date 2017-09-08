@@ -47,6 +47,8 @@ namespace NLiquid.Parser.Mapping
 			ForSourceExpr -> ForSource;
 			Body -> Body;
 		}
+		| Break    -> Break { }
+		| Continue -> Continue { }
 	}
 
 	map syntax Grammar.ElseIf -> ElseIf

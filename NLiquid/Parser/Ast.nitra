@@ -25,6 +25,7 @@ namespace NLiquid.Parser.Ast
 	abstract ast Statement : BindableAst
 	{
 		in CurrentTable : TableScope;
+		in InsideLoopOrSwitch: LoopOrSwitch;
 
 		| Plain  { }
 		| Comment { }
@@ -36,15 +37,18 @@ namespace NLiquid.Parser.Ast
 		 }
 		| If : LocalVariableScope
 		{
-			CurrentTable         = LocalVariables;
-			// протаскиваем текущую таблицу имен во вложенные блоки
+			CurrentTable         = LocalVariables;			
 			Body.CurrentTable    = CurrentTable;
 			ElseIfs.CurrentTable = CurrentTable;
 			Else.CurrentTable    = CurrentTable;
-			Body.Scope           = Scope.HideWith(LocalVariables); // скрываем скопом локальных переменных скопы сформированные выше.
+			Body.Scope           = Scope.HideWith(LocalVariables);
 			Condition.Scope      = Scope;
 			ElseIfs.Scope        = Scope;
 			Else.Scope           = Scope;
+
+			Body.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
+			ElseIfs.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
+			Else.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
 
 			Condition : Expr;
 			Body      : Statement*;
@@ -56,18 +60,34 @@ namespace NLiquid.Parser.Ast
 			CurrentTable      = LocalVariables;
 			Body.CurrentTable = CurrentTable;
 			Body.Scope        = Scope.HideWith(LocalVariables);
+			Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
 			Condition.Scope   = Scope;
 
 			Condition : Expr;
 			Body      : Statement*;
 		}
+		| Break : Jumpable
+		{
+			
+		}
+		| Continue : Jumpable
+		{
+			
+		}
 	}
+
+	abstract ast Jumpable : Statement
+	{
+		unless(this.IsInsideLoopOrSwitchEvaluated)
+			Error(context, "No enclosing loop out of which to break or continue");
+	}	
 
 	ast ElseIf : Statement, LocalVariableScope
 	{
 		CurrentTable      = LocalVariables;
 		Body.CurrentTable = CurrentTable;
 		Body.Scope        = Scope.HideWith(LocalVariables);
+		Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
 		Condition.Scope   = Scope;
 
 		Condition : Expr;
@@ -79,7 +99,7 @@ namespace NLiquid.Parser.Ast
 		CurrentTable      = LocalVariables;
 		Body.CurrentTable = CurrentTable;
 		Body.Scope        = Scope.HideWith(LocalVariables);
-
+		Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
 		Body: Statement*;
 	}
 
@@ -108,19 +128,25 @@ namespace NLiquid.Parser.Ast
 
 			Body: Statement*;
 		}
-		| For : LocalVariableScope
+		| For : LocalVariableScope, LoopOrSwitch
 		{
 			Symbol.Kind         = "for";
 			Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
 			ForSource.Scope     = Scope;
-			Body.Scope          = Scope.HideWith(LocalVariables);
 			ContainingTable     = LocalVariables;
 			CurrentTable        = LocalVariables;
+			Body.Scope          = Scope.HideWith(LocalVariables);			
 			Body.CurrentTable   = CurrentTable;
+			Body.InsideLoopOrSwitch = this;
 
 			ForSource : Expr;
 			Body      : Statement*;
 		}
+	}
+	
+	abstract ast LoopOrSwitch
+	{
+
 	}
 
 	abstract ast Binary : Expr

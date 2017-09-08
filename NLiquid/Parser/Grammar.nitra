@@ -58,6 +58,8 @@ namespace NLiquid.Parser.Syntax
 			| Output      = OpenOutput s sm OutputExpr s sm  CloseOutput
 			| Assignment  = OpenTag s sm "assign" s sm Name s sm "=" s sm FilteredExpr s CloseTag
 			| Capture     = OpenTag s sm "capture" s sm  Name s sm CloseTag s sm Body=Block* s sm OpenTag s sm "endcapture" s sm CloseTag
+			| Break       = OpenTag s sm "break" s sm  CloseTag
+			| Continue    = OpenTag s sm "continue" s sm  CloseTag
 		}
 
 		syntax ElseIf = OpenTag s sm "elsif" s sm  Expr s sm CloseTag s sm ElseTrueBranch=Block*;
