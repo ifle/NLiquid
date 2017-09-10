@@ -3,10 +3,18 @@
 
 root = true
 
+<<<<<<< HEAD
 [*.{nitra,n}]
+=======
+[*]
+>>>>>>> e2c2e354aeda8ac7d5787db553cfafd7bcd7ff52
 end_of_line = crlf
 charset = utf-8
 insert_final_newline = true
 trim_trailing_whitespace = true
+<<<<<<< HEAD
+indent_style = space
+=======
 indent_style = tab
+>>>>>>> e2c2e354aeda8ac7d5787db553cfafd7bcd7ff52
 indent_size = 2

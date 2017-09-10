@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 
 using Nemerle;
 using Nemerle.Collections;
@@ -45,13 +45,13 @@ namespace NLiquid
 				FullName = "<root>";
 				Kind = "root";
 			};
-			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));			
-      
+			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));
+
 			def globalTypes     = NLiquidGlobalTypes(root.MemberTable);
 			def filters         = FilterTypes.Create(root.MemberTable, globalTypes);
 			def predefinedTypes = PredefinedTypes(globalTypes, filters);
 			def context         = NLiquidDependentPropertyEvalContext(predefinedTypes);
-			
+
 			ProjectData(context, root)
 		}
 

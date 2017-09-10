@@ -6,7 +6,7 @@ namespace NLiquid.Parser.Syntax
 	{
 		using Nitra.Core;
 		using Nitra.CStyleComments;
-		using Nitra.Identifiers;
+		//using Nitra.Identifiers;
 
 		keyword regex ['a'..'z', '_']+ rule S;
 
