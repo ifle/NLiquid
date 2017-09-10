@@ -303,3 +303,5 @@ Doc/~$tra-doc.doc
 Nitra.gpState
 *.gpState
 Doc/~$*
+
+*.orig
