@@ -1,4 +1,4 @@
-﻿using Nitra;
+using Nitra;
 using Nitra.Declarations;
 using Nitra.Runtime;
 
@@ -6,6 +6,9 @@ using NLiquid;
 
 using System.IO;
 using System.Collections.Immutable;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NLiquid.Parser.Ast
 {
@@ -130,9 +133,15 @@ namespace NLiquid.Parser.Ast
 		}
 		| JObjectVariable
 		{
+		/*
+			symbol
+			{
+				in Data : JObject;
+			}*/
 			ContainingTable   = CurrentTable;
 			Symbol.Kind       = "object";
 			Symbol.Type       = context.GetGlobalTypes().Object;
+			//Symbol.Data				= JObject.Parse(Initializer.GetText(Digits));
 			Initializer.Scope = Scope;
 
 			Initializer : Expr;
