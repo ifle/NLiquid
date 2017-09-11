@@ -1,4 +1,4 @@
-﻿using Nitra;
+using Nitra;
 using Nitra.Declarations;
 using NLiquid.Parser.Syntax;
 using NLiquid.Parser.Ast;
@@ -20,33 +20,39 @@ namespace NLiquid.Parser.Mapping
 		| Comment -> Comment {}
 		| Output -> Output { OutputExpr -> Expr; }
 		| If -> If
-		{
-				Expr       -> Condition;
-				TrueBranch -> Body;
-				ElseIfs    -> ElseIfs;
-				ElseOpt    -> Else;
-		}
+			{
+					Expr       -> Condition;
+					TrueBranch -> Body;
+					ElseIfs    -> ElseIfs;
+					ElseOpt    -> Else;
+			}
 		| Unless -> Unless
-		{
-			Expr -> Condition;
-			Body -> Body;
-		}
+			{
+				Expr -> Condition;
+				Body -> Body;
+			}
 		| Assignment -> LocalVariable.SimpleLocalVariable
-		{
-			Name -> Name;
-			FilteredExpr -> Initializer;
-		}
+			{
+				Name -> Name;
+				FilteredExpr -> Initializer;
+			}
 		| Capture -> LocalVariable.CaptureLocalVariable
-		{
-			Name -> Name;
-			Body -> Body;
-		}
+			{
+				Name -> Name;
+				Body -> Body;
+			}
+		| JObjectVar -> LocalVariable.JObjectVariable
+			{
+				Name -> Name;
+				Body -> Initializer;
+			}
+
 		| For -> LocalVariable.For
-		{
-			Name -> Name;
-			ForSourceExpr -> ForSource;
-			Body -> Body;
-		}
+			{
+				Name -> Name;
+				ForSourceExpr -> ForSource;
+				Body -> Body;
+			}
 		| Break    -> Break { }
 		| Continue -> Continue { }
 	}

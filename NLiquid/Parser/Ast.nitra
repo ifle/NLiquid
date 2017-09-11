@@ -37,7 +37,7 @@ namespace NLiquid.Parser.Ast
 		 }
 		| If : LocalVariableScope
 		{
-			CurrentTable         = LocalVariables;			
+			CurrentTable         = LocalVariables;
 			Body.CurrentTable    = CurrentTable;
 			ElseIfs.CurrentTable = CurrentTable;
 			Else.CurrentTable    = CurrentTable;
@@ -68,11 +68,11 @@ namespace NLiquid.Parser.Ast
 		}
 		| Break : Jumpable
 		{
-			
+
 		}
 		| Continue : Jumpable
 		{
-			
+
 		}
 	}
 
@@ -80,7 +80,7 @@ namespace NLiquid.Parser.Ast
 	{
 		unless(this.IsInsideLoopOrSwitchEvaluated)
 			Error(context, "No enclosing loop out of which to break or continue");
-	}	
+	}
 
 	ast ElseIf : Statement, LocalVariableScope
 	{
@@ -113,11 +113,11 @@ namespace NLiquid.Parser.Ast
 		| SimpleLocalVariable
 		{
 			ContainingTable   = CurrentTable;
-			  Symbol.Kind       = "assigment";
-			  Symbol.Type       = Initializer.Type;
-			  Initializer.Scope = Scope;
+			Symbol.Kind       = "assigment";
+			Symbol.Type       = Initializer.Type;
+			Initializer.Scope = Scope;
 
-			  Initializer : Expr;
+			Initializer : Expr;
 		}
 		| CaptureLocalVariable
 		{
@@ -128,6 +128,15 @@ namespace NLiquid.Parser.Ast
 
 			Body: Statement*;
 		}
+		| JObjectVariable
+		{
+			ContainingTable   = CurrentTable;
+			Symbol.Kind       = "object";
+			Symbol.Type       = context.GetGlobalTypes().Object;
+			Initializer.Scope = Scope;
+
+			Initializer : Expr;
+		}
 		| For : LocalVariableScope, LoopOrSwitch
 		{
 			Symbol.Kind         = "for";
@@ -135,7 +144,7 @@ namespace NLiquid.Parser.Ast
 			ForSource.Scope     = Scope;
 			ContainingTable     = LocalVariables;
 			CurrentTable        = LocalVariables;
-			Body.Scope          = Scope.HideWith(LocalVariables);			
+			Body.Scope          = Scope.HideWith(LocalVariables);
 			Body.CurrentTable   = CurrentTable;
 			Body.InsideLoopOrSwitch = this;
 
@@ -143,7 +152,7 @@ namespace NLiquid.Parser.Ast
 			Body      : Statement*;
 		}
 	}
-	
+
 	abstract ast LoopOrSwitch
 	{
 
@@ -229,6 +238,7 @@ namespace NLiquid.Parser.Ast
 		}
 		| MemberAccess
 		{
+			Type = context.GetGlobalTypes().GetMemberAccess(this);
 			Qualifier.Scope = Scope;
 			Reference.Scope = Scope;
 

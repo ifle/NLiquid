@@ -1,4 +1,4 @@
-﻿using Nemerle;
+using Nemerle;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
@@ -69,6 +69,11 @@ namespace NLiquid
 								| ArraySymbol as arr => arr.ElemType
 								| _ => Nil
 						}
+		}
+
+		public GetMemberAccess(node: Expr.MemberAccess): TypeSymbol
+		{
+		    Nil;
 		}
 	}
 }
