@@ -9,8 +9,9 @@ namespace NLiquid.Parser.Mapping
 	map syntax Grammar.Reference -> Reference = Reference(this);
 	map syntax Grammar.Name      -> Name      = Name(this);
 
-	map syntax Grammar.Blocks -> CompilationUnit
+	map syntax Grammar.CompilationUnit -> CompilationUnit
 	{
+		ParamsDefCommentOpt -> Parameter;
 		Blocks -> Statements;
 	}
 
@@ -68,6 +69,12 @@ namespace NLiquid.Parser.Mapping
 		ElseBranch -> Body;
 	}
 
+	map syntax Grammar.ParamsDefComment -> Parameter
+	{
+		Name -> Name;
+		Type -> Type;
+	}
+
 	map syntax Grammar.FilteredExpr -> Expr
 	{
 		| FilterWithoutArgs   -> Call { FilteredExpr -> Arg0; [] -> Args; Reference -> FuncName; }
@@ -78,6 +85,12 @@ namespace NLiquid.Parser.Mapping
 				Args.Item1   -> Args;
 				Reference    -> FuncName;
 			}
+	}
+
+	map syntax Grammar.QualifiedReference -> QualifiedReference
+	{
+		| Reference -> Simple { Reference -> Name; }
+		| Qualified -> Qualified { QualifiedReference -> Qualifier; Reference -> Name;	}
 	}
 
 	map syntax Grammar.OutputExpr -> Expr

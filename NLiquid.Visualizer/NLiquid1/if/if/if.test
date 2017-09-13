@@ -1,4 +1,5 @@
-﻿<!-- If customer.name = 'anonymous' -->
+{% comment %} customer : Models.Customer {% endcomment %}
+<!-- If customer.name = 'anonymous' -->
 {% if customer.Name == 'kevin' %}
   Hey Kevin!
 {% elsif customer.Name == 'anonymous' %}

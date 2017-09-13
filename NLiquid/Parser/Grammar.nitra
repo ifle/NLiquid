@@ -37,7 +37,7 @@ namespace NLiquid.Parser.Syntax
 			| SpaceToken = Spaces;
 		}
 
-		syntax Blocks = Block*;
+		syntax CompilationUnit = ParamsDefComment? Block*;
 
 		syntax Block
 		{
@@ -66,8 +66,14 @@ namespace NLiquid.Parser.Syntax
 		syntax ElseIf = OpenTag s sm "elsif" s sm  Expr s sm CloseTag s sm ElseTrueBranch=Block*;
 		syntax Else   = OpenTag s sm "else"  s sm            CloseTag s sm ElseBranch=Block*;
 
+		syntax CommentOpen  = OpenTag s sm "comment"    s sm CloseTag;
+		syntax CommentClose = OpenTag s sm "endcomment" s sm CloseTag;
+
 		[SpanClass(MultilineComment)]
-		syntax Comment = OpenTag s sm "comment" s sm CloseTag s sm Body=(!(OpenTag s sm "endcomment") Any)* s sm OpenTag s sm "endcomment" s sm CloseTag;
+		syntax Comment = CommentOpen s sm Body=(!CommentClose Any)* s sm CommentClose;
+
+		[SpanClass(MultilineComment)]
+		syntax ParamsDefComment = CommentOpen s sm Name s sm ":" s sm Type=QualifiedReference s sm CommentClose;
 
 		syntax OutputExpr
 		{
@@ -120,6 +126,14 @@ namespace NLiquid.Parser.Syntax
 		precedence Primary:
 			| MemberAccess =  Expr s "." s Reference
 			| ArrayAccess  = Reference s "[" s Expr s "]"
+		}
+
+		syntax QualifiedReference
+		{
+			| Reference
+
+		precedence Primary:
+			| Qualified =  QualifiedReference s "." s Reference
 		}
 
 		syntax FilteredExpr

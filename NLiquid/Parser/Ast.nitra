@@ -16,9 +16,28 @@ namespace NLiquid.Parser.Ast
 	{
 		Statements.CurrentTable = LocalVariables;
 		Statements.Scope = Scope.HideWith(LocalVariables);
+		Parameter.Scope = Scope;
 
+		Parameter : Parameter?;
 		Statements : Statement*;
 	}
+
+	declaration Parameter : BindableAst, LocalVariableScope
+	{
+		symbol
+		{
+			in Type : TypeSymbol;
+		}
+
+		out TypeRef : Ref[TypeSymbol] = Type.Ref.Resolve();
+
+		ContainingTable = LocalVariables;
+		Type.Scope = Scope;
+		Symbol.Type = TypeRef.Symbol;
+
+		Type : QualifiedReference;
+	}
+
 
 	abstract ast LocalVariableScope
 	{
@@ -306,6 +325,29 @@ namespace NLiquid.Parser.Ast
 		| NotEqual     : EqualExpr{ }
 	}
 
+	abstract ast QualifiedReference : BindableAst
+	{
+		out Ref : Ref[DeclarationSymbol];
+
+		| Simple
+			{
+				Name.Scope  = Scope;
+				Ref         = Name.Ref.Resolve();
+
+				Name : Reference;
+			}
+
+		| Qualified
+			{
+				Qualifier.Scope = Scope;
+				Name.Scope      = Qualifier.Ref.Scope;
+				Ref             = Name.Ref.Resolve();
+
+				Qualifier : QualifiedReference;
+				Name      : Reference;
+			}
+	}
+
 	abstract ast TypeReference
 	{
 		in Type : TypeSymbol;
@@ -328,6 +370,7 @@ namespace NLiquid.Parser.Ast
 	declaration Dictionary  : Type {}
 	declaration Namespace : NamespaceMambers, Container
 	{
+		symbol { Scope = MemberTable; }
 		Members : NamespaceMambers*;
 	}
 	abstract ast NamespaceMambers
@@ -335,10 +378,7 @@ namespace NLiquid.Parser.Ast
 	}
 	declaration UserDefinedType : Type, NamespaceMambers, Container
 	{
-		symbol
-		{
-			in Properties : ImmutableArray[PropertySymbol];
-		}
+		symbol { Scope = MemberTable; }
 	}
 	declaration Property
 	{
