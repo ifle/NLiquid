@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
 using NLiquid.Parser;
 using NLiquid.Parser.Ast;
@@ -30,7 +31,7 @@ namespace NLiquid
 		private class ProjectData
 		{
 			public Context : NLiquidDependentPropertyEvalContext;
-			public Root    : RootSymbol;
+			public Root    : NamespaceSymbol;
 		}
 
 		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
@@ -40,19 +41,24 @@ namespace NLiquid
 		public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
 		{
 			IgnoreParams();
-			def root = RootSymbol() <-
+			def rootNamespace = NamespaceSymbol() <-
 			{
 				FullName = "<root>";
 				Kind = "root";
 			};
-			root.AddDeclaration(ExternalDeclaration.[RootSymbol](Name(NoLocation, "<root>")));
+			rootNamespace.AddDeclaration(ExternalDeclaration.[NamespaceSymbol](Name(NoLocation, "<root>")));
 
-			def globalTypes     = NLiquidGlobalTypes(root.MemberTable);
-			def filters         = FilterTypes.Create(root.MemberTable, globalTypes);
+			def globalTable     = rootNamespace.MemberTable;
+			def globalTypes     = NLiquidGlobalTypes(globalTable);
+			def filters         = FilterTypes.Create(globalTable, globalTypes);
 			def predefinedTypes = PredefinedTypes(globalTypes, filters);
-			def context         = NLiquidDependentPropertyEvalContext(predefinedTypes);
 
-			ProjectData(context, root)
+			def context = NLiquidDependentPropertyEvalContext(predefinedTypes);
+
+			LoadUserDefinedTypes(context, rootNamespace, project);
+
+
+			ProjectData(context, rootNamespace)
 		}
 
 		public RefreshProject(cancellationToken : CancellationToken, files : ImmutableArray[FileEvalPropertiesData], data : object) : void
@@ -72,6 +78,86 @@ namespace NLiquid
 			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedTypes.Symbols);
 			evalHost.EvalProperties(context, "Pass0", 0);
 			evalHost.EvalProperties(context, "Pass1", 1);
+		}
+
+		LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : void
+		{
+		  def systemTypeToTypeSymbolMap = Hashtable();
+		  def globalTypes = context.PredefinedTypes.GlobalTypes;
+			def openNamespace(parent : NamespaceSymbol, name : string) : NamespaceSymbol
+			{
+				def r = Reference(Helpers.NoLocation, name);
+				def result = parent.MemberTable.Bind(r);
+				if (result.IsEmpty)
+					Helpers.DefineSymbol.[NamespaceSymbol](name, parent.MemberTable, context);
+				else
+				{
+					def symbols = result.GetSymbols();
+					assert2(symbols.Length == 1);
+					symbols[0]
+				}
+			}
+			def tryAddType(type : System.Type) : TypeSymbol
+			{
+			  mutable existsSymbol;
+			  when (systemTypeToTypeSymbolMap.TryGetValue(type, out existsSymbol))
+					return existsSymbol;
+
+			  when (type.IsSpecialName || !type.IsPublic || !(type.IsClass || type.IsValueType) || type.IsEnum && type.GetGenericArguments().Length > 0)
+			  {
+					return null;
+				}
+
+				def predefinedOpt = globalTypes.TryGetSymbol(type);
+				when (predefinedOpt != null)
+				{
+				  systemTypeToTypeSymbolMap.Add(type, predefinedOpt);
+				  return predefinedOpt;
+				}
+
+				def nsPath = type.Namespace.Split('.');
+				mutable ns = globalNamespace;
+				foreach (name in nsPath)
+					ns = openNamespace(ns, name);
+				def r = Reference(Helpers.NoLocation, type.Name);
+				def result = ns.MemberTable.Bind(r);
+				if (result.IsEmpty)
+				{
+					def symbol = Helpers.DefineSymbol.[UserDefinedTypeSymbol](type.Name, ns.MemberTable, context);
+					systemTypeToTypeSymbolMap.Add(type, symbol);
+					def properties = type.GetProperties();
+					foreach (prop when prop.CanRead && !prop.IsSpecialName in properties)
+					{
+					  def getter = prop.GetGetMethod();
+					  def attr = getter.Attributes;
+					  when (getter.GetParameters().Length != 0 && !(attr %&& MethodAttributes.Public) && attr %&& MethodAttributes.Static)
+							continue;
+						def propTypeSymbol = tryAddType(prop.PropertyType);
+						when (propTypeSymbol == null)
+							continue;
+						def propSymbol = Helpers.DefineSymbol.[PropertySymbol](prop.Name, symbol.MemberTable);
+						propSymbol.Type = propTypeSymbol;
+					}
+					symbol // for debug purpose
+				}
+				else
+				{
+					def symbols = result.GetSymbols();
+					assert2(symbols.Length == 1);
+					symbols[0]
+				}
+			}
+
+			foreach (lib in project.Libs)
+			{
+			  def asm = Assembly.ReflectionOnlyLoadFrom(lib.Path);
+			  def types = asm.GetTypes();
+			  foreach (type in types)
+			  {
+			    def typeSymbol = tryAddType(type);
+			    _ = typeSymbol;
+			  }
+			}
 		}
 
 		public DeconstructType(symbol : DeclarationSymbol, _type : out TypeSymbol, typeArgs : out ImmutableArray[TypeSymbol]) : bool

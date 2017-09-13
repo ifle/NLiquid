@@ -1,7 +1,7 @@
-<!-- If customer.name = 'anonymous' -->
-{% if customer.name == 'kevin' %}
+﻿<!-- If customer.name = 'anonymous' -->
+{% if customer.Name == 'kevin' %}
   Hey Kevin!
-{% elsif customer.name == 'anonymous' %}
+{% elsif customer.Name == 'anonymous' %}
   Hey Anonymous!
 {% else %}
   Hi Stranger!

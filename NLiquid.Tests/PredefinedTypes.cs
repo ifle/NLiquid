@@ -21,16 +21,16 @@ namespace NLiquid.Tests
 		public void LoadGlobalTypes_Test()
 		{
 			// Arrange
-			var root = new RootSymbol
-						{
-							FullName = "<root>",
-							Kind = "root"
-						};
+			var root = new NamespaceSymbol
+			{
+				FullName = "<root>",
+				Kind = "root"
+			};
 
 			// Act
 			var types = new NLiquidGlobalTypes(root.MemberTable);
 
-			// Assert	
+			// Assert
 			Assert.NotNull(types);
 			CollectionAssert.IsNotEmpty(types.Types);
 		}
@@ -39,8 +39,8 @@ namespace NLiquid.Tests
 		public void LoadFilters_Test()
 		{
 			// Arrange
-			var root = new RootSymbol
-						{
+			var root = new NamespaceSymbol
+			{
 							FullName = "<root>",
 							Kind = "root"
 						};
@@ -48,7 +48,7 @@ namespace NLiquid.Tests
 			// Act
 			var filters = FilterTypes.Create(root.MemberTable, globalTypes);
 
-			// Assert	
+			// Assert
 			Assert.NotNull(filters);
 			CollectionAssert.IsNotEmpty(filters.Filters);
 		}
@@ -57,7 +57,7 @@ namespace NLiquid.Tests
 		public void LoadPredefinedTypes_Test()
 		{
 			// Arrange
-			var root = new RootSymbol
+			var root = new NamespaceSymbol
 			{
 				FullName = "<root>",
 				Kind = "root"
@@ -68,7 +68,7 @@ namespace NLiquid.Tests
 			// Act
 			var predefinedTypes = new PredefinedTypes(globalTypes, filters);
 
-			// Assert	
+			// Assert
 			Assert.NotNull(predefinedTypes.GlobalTypes);
 			Assert.NotNull(predefinedTypes.Filters);
 			CollectionAssert.IsNotEmpty(predefinedTypes.Symbols);

@@ -140,7 +140,7 @@ namespace NLiquid.Parser.Ast
 			}*/
 			ContainingTable   = CurrentTable;
 			Symbol.Kind       = "object";
-			Symbol.Type       = context.GetGlobalTypes().Object;
+			//Symbol.Type       = context.GetGlobalTypes().Object;
 			//Symbol.Data				= JObject.Parse(Initializer.GetText(Digits));
 			Initializer.Scope = Scope;
 
@@ -315,12 +315,10 @@ namespace NLiquid.Parser.Ast
 		| Int        { Type = context.GetGlobalTypes().Int;        }
 		| Boolean    { Type = context.GetGlobalTypes().Boolean;    }
 		| String     { Type = context.GetGlobalTypes().String;     }
-		| Object     { Type = context.GetGlobalTypes().Object;     }
+		| Object     {  }
 		| Array      { ElemType : TypeReference; Type = context.GetGlobalTypes().GetArrayType(ElemType.Type); }
 		| Dictionary { Type = context.GetGlobalTypes().Dictionary; }
 	}
-
-	declaration Root        : Container {}
 
 	declaration Nil         : Type {}
 	declaration Int         : Type {}
@@ -328,18 +326,25 @@ namespace NLiquid.Parser.Ast
 	declaration Boolean     : Type {}
 	declaration String      : Type {}
 	declaration Dictionary  : Type {}
+	declaration Namespace : NamespaceMambers, Container
+	{
+		Members : NamespaceMambers*;
+	}
+	abstract ast NamespaceMambers
+	{
+	}
+	declaration UserDefinedType : Type, NamespaceMambers, Container
+	{
+		symbol
+		{
+			in Properties : ImmutableArray[PropertySymbol];
+		}
+	}
 	declaration Property
 	{
 		symbol
 		{
 			in Type : TypeSymbol;
-		}
-	}
-	declaration Object      : Type
-	{
-		symbol
-		{
-			in Properties : ImmutableArray[PropertySymbol];
 		}
 	}
 	declaration Array       : Type

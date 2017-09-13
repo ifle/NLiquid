@@ -1,10 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-16"?>
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ProjectSupport Caption="NLiquid" TypeFullName="NLiquid.ProjectSupport" Path="..\..\NLiquid\bin\Debug\NLiquid.dll" />
+  <ProjectSupport Caption="NLiquid" TypeFullName="NLiquid.ProjectSupport" Path="C:\!\NLiquid\NLiquid\NLiquid\bin\Debug\NLiquid.dll" />
   <Languages>
     <Language Name="Liquid" Path="..\..\NLiquid\bin\Debug\NLiquid.dll">
       <DynamicExtensions />
     </Language>
   </Languages>
-  <References />
+  <References>
+    <Reference>File:..\..\Models\bin\Debug\Models.dll</Reference>
+  </References>
 </Config>

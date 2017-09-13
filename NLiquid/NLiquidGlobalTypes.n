@@ -23,7 +23,7 @@ namespace NLiquid
 		public Int               : IntSymbol;
 		public Boolean           : BooleanSymbol;
 		public String            : StringSymbol;
-		public Object            : ObjectSymbol;
+		public Object            : UserDefinedTypeSymbol;
 		public Array             : ArraySymbol;
 		public Dictionary        : DictionarySymbol;
 		public Types             : ImmutableArray[DeclarationSymbol];
@@ -39,7 +39,7 @@ namespace NLiquid
 			Int        = Helpers.DefineSymbol.[IntSymbol]("int", scope);
 			Boolean    = Helpers.DefineSymbol.[BooleanSymbol]("bool", scope);
 			String     = Helpers.DefineSymbol.[StringSymbol]("string", scope);
-			Object     = Helpers.DefineSymbol.[ObjectSymbol]("object", scope);
+			Object     = Helpers.DefineSymbol.[UserDefinedTypeSymbol]("object", scope);
 			Array      = Helpers.DefineSymbol.[ArraySymbol]("array", scope);
 			Dictionary = Helpers.DefineSymbol.[DictionarySymbol]("dictionary", scope);
 
@@ -48,6 +48,29 @@ namespace NLiquid
 			builder.AddRange(named);
 
 			Types = builder.MoveToImmutable();
+		}
+
+		public TryGetSymbol(type: System.Type) : TypeSymbol
+		{
+			match (System.Type.GetTypeCode(type))
+			{
+				| TypeCode.Boolean => this.Boolean
+				| TypeCode.UInt64
+				| TypeCode.Double  => this.Double
+				| TypeCode.Byte
+				| TypeCode.Int16
+				| TypeCode.Int32
+				| TypeCode.Int64
+				| TypeCode.SByte
+				| TypeCode.Single
+				| TypeCode.UInt16
+				| TypeCode.UInt32  => this.Int
+				//| TypeCode.Decimal
+				| TypeCode.Empty   => this.Nil
+				| TypeCode.Char
+				| TypeCode.String  => this.String
+				| _                => null
+			}
 		}
 
 		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
@@ -64,11 +87,11 @@ namespace NLiquid
 
 		public GetArrayElemType(arrayType : TypeSymbol) : TypeSymbol
 		{
-						match(arrayType)
-						{
-								| ArraySymbol as arr => arr.ElemType
-								| _ => Nil
-						}
+			match(arrayType)
+			{
+				| ArraySymbol as arr => arr.ElemType
+				| _ => Nil
+			}
 		}
 	}
 }
