@@ -143,7 +143,7 @@ namespace NLiquid.Parser.Mapping
 		| Int          -> Int    { Value = ParsedValue(Digits, int.Parse(GetText(Digits))); }
 		| SStr         -> SStr   { Value = ParsedValue(Value, GetText(Value)); }
 		| DStr         -> DStr   { Value = ParsedValue(Value, GetText(Value)); }
-		| Reference    -> LocalVariableRef  { Reference -> Reference; }
+		| Reference    -> SimpleReference { Reference -> Reference; }
 		| MemberAccess -> MemberAccess { Expr -> Qualifier; Reference -> Reference; }
 		| ArrayAccess  -> ArrayAccess  { Expr -> Index; Reference -> Reference; }
 		| Or           { Expr1 -> Expr1; Expr2 -> Expr2; }

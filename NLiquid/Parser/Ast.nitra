@@ -238,7 +238,7 @@ namespace NLiquid.Parser.Ast
 			Type = context.GetGlobalTypes().String;
 			Value : string;
 		}
-		| LocalVariableRef
+		| SimpleReference
 		{
 			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
 			Reference.Scope = Scope;
@@ -247,13 +247,14 @@ namespace NLiquid.Parser.Ast
 		}
 		| MemberAccess
 		{
-			Type = context.GetGlobalTypes().GetMemberAccess(this);
+			in PropertyRef : Ref[PropertySymbol] = Reference.Ref.Resolve();
+
+			Type = PropertyRef.Symbol.Type;
 			Qualifier.Scope = Scope;
-			Reference.Scope = Scope;
+			Reference.Scope = Qualifier.Type.Scope;
 
 			Qualifier : Expr;
 			Reference : Reference;
-
 		}
 		| ArrayAccess
 		{
