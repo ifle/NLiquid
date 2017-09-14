@@ -1,4 +1,4 @@
-
-{% unless product.title == 'Awesome Shoes' %}
+﻿{% comment %} product : Models.Product {% endcomment %}
+{% unless product.Title == 'Awesome Shoes' %}
   These shoes are not awesome.
 {% endunless %}
