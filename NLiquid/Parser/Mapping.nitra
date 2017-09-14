@@ -32,23 +32,23 @@ namespace NLiquid.Parser.Mapping
 				Expr -> Condition;
 				Body -> Body;
 			}
-		| Assignment -> LocalVariable.SimpleLocalVariable
+		| Assignment -> SimpleLocalVariable
 			{
 				Name -> Name;
 				FilteredExpr -> Initializer;
 			}
-		| Capture -> LocalVariable.CaptureLocalVariable
+		| Capture -> CaptureLocalVariable
 			{
 				Name -> Name;
 				Body -> Body;
 			}
-		| JObjectVar -> LocalVariable.JObjectVariable
+		| JObjectVar -> JObjectVariable
 			{
 				Name -> Name;
 				Body -> Initializer;
 			}
 
-		| For -> LocalVariable.For
+		| For -> For
 			{
 				Name -> Name;
 				ForSourceExpr -> ForSource;

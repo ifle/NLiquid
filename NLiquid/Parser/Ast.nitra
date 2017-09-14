@@ -14,30 +14,24 @@ namespace NLiquid.Parser.Ast
 {
 	ast CompilationUnit : BindableAst, LocalVariableScope
 	{
-		Statements.CurrentTable = LocalVariables;
-		Statements.Scope = Scope.HideWith(LocalVariables);
-		Parameter.Scope = Scope;
+		Statements.CurrentTable   = LocalVariables;
+		Statements.Scope          = Scope.HideWith(LocalVariables);
+		Parameter.Scope           = Scope;
+		Parameter.ContainingTable = LocalVariables;
 
 		Parameter : Parameter?;
 		Statements : Statement*;
 	}
 
-	declaration Parameter : BindableAst, LocalVariableScope
+	declaration Parameter : BindableAst, LocalVariable
 	{
-		symbol
-		{
-			in Type : TypeSymbol;
-		}
-
 		out TypeRef : Ref[TypeSymbol] = Type.Ref.Resolve();
 
-		ContainingTable = LocalVariables;
 		Type.Scope = Scope;
 		Symbol.Type = TypeRef.Symbol;
 
 		Type : QualifiedReference;
 	}
-
 
 	abstract ast LocalVariableScope
 	{
@@ -125,60 +119,63 @@ namespace NLiquid.Parser.Ast
 		Body: Statement*;
 	}
 
-	abstract declaration LocalVariable : Statement
+	abstract declaration LocalVariable
 	{
 		symbol
 		{
 			in Type : TypeSymbol;
 		}
+	}
 
-		| SimpleLocalVariable
+	declaration SimpleLocalVariable : Statement, LocalVariable
+	{
+		ContainingTable   = CurrentTable;
+		Symbol.Kind       = "assigment";
+		Symbol.Type       = Initializer.Type;
+		Initializer.Scope = Scope;
+
+		Initializer : Expr;
+	}
+
+	declaration CaptureLocalVariable : Statement, LocalVariable
+	{
+		ContainingTable   = CurrentTable;
+		Symbol.Kind       = "capture";
+		Symbol.Type       = context.GetGlobalTypes().String;
+		Body.Scope        = Scope;
+
+		Body: Statement*;
+	}
+
+	declaration JObjectVariable : Statement, LocalVariable
+	{
+	/*
+		symbol
 		{
-			ContainingTable   = CurrentTable;
-			Symbol.Kind       = "assigment";
-			Symbol.Type       = Initializer.Type;
-			Initializer.Scope = Scope;
+			in Data : JObject;
+		}*/
+		ContainingTable   = CurrentTable;
+		Symbol.Kind       = "object";
+		//Symbol.Type       = context.GetGlobalTypes().Object;
+		//Symbol.Data				= JObject.Parse(Initializer.GetText(Digits));
+		Initializer.Scope = Scope;
 
-			Initializer : Expr;
-		}
-		| CaptureLocalVariable
-		{
-			ContainingTable   = CurrentTable;
-			Symbol.Kind       = "capture";
-			Symbol.Type       = context.GetGlobalTypes().String;
-			Body.Scope        = Scope;
+		Initializer : Expr;
+	}
 
-			Body: Statement*;
-		}
-		| JObjectVariable
-		{
-		/*
-			symbol
-			{
-				in Data : JObject;
-			}*/
-			ContainingTable   = CurrentTable;
-			Symbol.Kind       = "object";
-			//Symbol.Type       = context.GetGlobalTypes().Object;
-			//Symbol.Data				= JObject.Parse(Initializer.GetText(Digits));
-			Initializer.Scope = Scope;
+	declaration For : Statement, LocalVariable, LocalVariableScope, LoopOrSwitch
+	{
+		Symbol.Kind         = "for";
+		Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
+		ForSource.Scope     = Scope;
+		ContainingTable     = LocalVariables;
+		CurrentTable        = LocalVariables;
+		Body.Scope          = Scope.HideWith(LocalVariables);
+		Body.CurrentTable   = CurrentTable;
+		Body.InsideLoopOrSwitch = this;
 
-			Initializer : Expr;
-		}
-		| For : LocalVariableScope, LoopOrSwitch
-		{
-			Symbol.Kind         = "for";
-			Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
-			ForSource.Scope     = Scope;
-			ContainingTable     = LocalVariables;
-			CurrentTable        = LocalVariables;
-			Body.Scope          = Scope.HideWith(LocalVariables);
-			Body.CurrentTable   = CurrentTable;
-			Body.InsideLoopOrSwitch = this;
-
-			ForSource : Expr;
-			Body      : Statement*;
-		}
+		ForSource : Expr;
+		Body      : Statement*;
 	}
 
 	abstract ast LoopOrSwitch
