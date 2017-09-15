@@ -101,6 +101,9 @@
     <Compile Include="Helpers.n">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IPostprocessing.n">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NLiquidDependentPropertyEvalContext.n">
       <SubType>Code</SubType>
     </Compile>
@@ -124,6 +127,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PredefinedTypes.n">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProjectData.n">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ProjectSupport.n">

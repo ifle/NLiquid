@@ -27,20 +27,27 @@ namespace NLiquid
 {
 	class ProjectSupport : IProjectSupport
 	{
-		[Record]
-		private class ProjectData
-		{
-			public Context : NLiquidDependentPropertyEvalContext;
-			public Root    : NamespaceSymbol;
-		}
-
 		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
 		static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
 		static NoSpan : NSpan              = NSpan(0);
 
+		_postprocessing : IPostprocessing;
+
+		public this()
+		{
+			def currentAsmPath = Assembly.GetExecutingAssembly().Location;
+			def path = IO.Path.GetDirectoryName(currentAsmPath);
+			def pompilerPath = IO.Path.Combine(path, @"NLiquid.Compiler.Service.dll");
+			def compilerAsm = Assembly.LoadFrom(pompilerPath);
+			def itf = typeof(IPostprocessing);
+			def compilerType = compilerAsm.GetTypes().Where(t => t.IsClass && t.IsPublic && itf.IsAssignableFrom(t)).First();
+			_postprocessing = Activator.CreateInstance(compilerType) :> IPostprocessing;
+		}
+
 		public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
 		{
 			IgnoreParams();
+
 			def rootNamespace = NamespaceSymbol() <-
 			{
 				FullName = "<root>";
@@ -78,6 +85,11 @@ namespace NLiquid
 			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedTypes.Symbols);
 			evalHost.EvalProperties(context, "Pass0", 0);
 			evalHost.EvalProperties(context, "Pass1", 1);
+		}
+
+		public Postprocessing(cancellationToken : CancellationToken, project : Project, asts : ImmutableArray[IAst * bool], data : object) : void
+		{
+			_postprocessing.Postprocessing(cancellationToken, project, asts, DecomposeData(data));
 		}
 
 		LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : void

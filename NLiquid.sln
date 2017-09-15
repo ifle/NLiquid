@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLiquid.Tests", "NLiquid.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{7300D30F-7BCD-492F-A224-FC9B02D141E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLiquid.Compiler.Service", "NLiquid.Compiler.Service\NLiquid.Compiler.Service.csproj", "{F7F6D830-BE9E-4D7B-8C44-668FC42C4693}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7300D30F-7BCD-492F-A224-FC9B02D141E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7300D30F-7BCD-492F-A224-FC9B02D141E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7300D30F-7BCD-492F-A224-FC9B02D141E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7F6D830-BE9E-4D7B-8C44-668FC42C4693}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7F6D830-BE9E-4D7B-8C44-668FC42C4693}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7F6D830-BE9E-4D7B-8C44-668FC42C4693}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7F6D830-BE9E-4D7B-8C44-668FC42C4693}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
