@@ -31,26 +31,22 @@ namespace NLiquid.Compiler.Service
 			TypeBuilder tb = mb.DefineType("NLiquidTemplates", TypeAttributes.Public);
 
             foreach (var compileUnit in asts)
-            {
                 if (compileUnit.Field1)
-                {
-                    var ast = compileUnit.Field0;
-                    var file = ast.Location.Source.File;
-                    var templateName = Path.GetFileNameWithoutExtension(file.Name).Replace(".", "_").Replace("-", "_");
-                    MethodBuilder methodBuilder = tb.DefineMethod(templateName, MethodAttributes.Public | MethodAttributes.Static, null, null);
-                    Expression<Action> expressionTree = EmitTemplateMethod(ast, methodBuilder);
-                    expressionTree.CompileToMethod(methodBuilder);
-                }
-            }
+                    EmitTemplateMethod(compileUnit.Field0, tb);
 
 			tb.CreateType();
 			ab.Save(dllName);
 		}
 
-        Expression<Action> EmitTemplateMethod(IAst field0, MethodBuilder methodBuilder)
+        void EmitTemplateMethod(IAst ast, TypeBuilder tb)
         {
+            var file = ast.Location.Source.File;
+            var templateName = Path.GetFileNameWithoutExtension(file.Name).Replace(".", "_").Replace("-", "_");
+            // здесь надо сформировать параметр по первому элементу АСТ, если он есть.
+            MethodBuilder methodBuilder = tb.DefineMethod(templateName, MethodAttributes.Public | MethodAttributes.Static, null, null);
             // генерируем код
-            return () => Console.WriteLine("Здесь надо сгенерировать код");
+            Expression<Action> expressionTree = () => Console.WriteLine("Здесь надо сгенерировать код");
+            expressionTree.CompileToMethod(methodBuilder);
         }
     }
 }
