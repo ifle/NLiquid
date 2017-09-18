@@ -62,8 +62,7 @@ namespace NLiquid
 
 			def context = NLiquidDependentPropertyEvalContext(predefinedTypes);
 
-			LoadUserDefinedTypes(context, rootNamespace, project);
-
+			predefinedTypes.AddDotNetTypes(LoadUserDefinedTypes(context, rootNamespace, project));
 
 			ProjectData(context, rootNamespace)
 		}
@@ -92,9 +91,10 @@ namespace NLiquid
 			_postprocessing.Postprocessing(cancellationToken, project, asts, DecomposeData(data));
 		}
 
-		LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : void
+		LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : Dictionary[TypeSymbol, System.Type]
 		{
 		  def systemTypeToTypeSymbolMap = Hashtable();
+		  def symbolTypeToSystemTypeMap = Dictionary();
 		  def globalTypes = context.PredefinedTypes.GlobalTypes;
 			def openNamespace(parent : NamespaceSymbol, name : string) : NamespaceSymbol
 			{
@@ -124,6 +124,7 @@ namespace NLiquid
 				when (predefinedOpt != null)
 				{
 				  systemTypeToTypeSymbolMap.Add(type, predefinedOpt);
+				  symbolTypeToSystemTypeMap.Add(predefinedOpt, type);
 				  return predefinedOpt;
 				}
 
@@ -137,6 +138,7 @@ namespace NLiquid
 				{
 					def symbol = Helpers.DefineSymbol.[UserDefinedTypeSymbol](type.Name, ns.MemberTable, context);
 					systemTypeToTypeSymbolMap.Add(type, symbol);
+					symbolTypeToSystemTypeMap.Add(symbol, type);
 					def properties = type.GetProperties();
 					foreach (prop when prop.CanRead && !prop.IsSpecialName in properties)
 					{
@@ -162,7 +164,7 @@ namespace NLiquid
 
 			foreach (lib in project.Libs)
 			{
-			  def asm = Assembly.ReflectionOnlyLoadFrom(lib.Path);
+			  def asm = Assembly.LoadFrom(lib.Path);
 			  def types = asm.GetTypes();
 			  foreach (type in types)
 			  {
@@ -170,6 +172,8 @@ namespace NLiquid
 			    _ = typeSymbol;
 			  }
 			}
+
+			symbolTypeToSystemTypeMap;
 		}
 
 		public DeconstructType(symbol : DeclarationSymbol, _type : out TypeSymbol, typeArgs : out ImmutableArray[TypeSymbol]) : bool

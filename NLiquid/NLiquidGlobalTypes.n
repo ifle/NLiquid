@@ -27,8 +27,9 @@ namespace NLiquid
 		public Array             : ArraySymbol;
 		public Dictionary        : DictionarySymbol;
 		public Types             : ImmutableArray[DeclarationSymbol];
+		public DotNetTypesMap    : Dictionary[TypeSymbol, System.Type] = Dictionary();
+		_arrayElemTypeMap        : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
 
-		_arrayElemTypeMap         : Dictionary[TypeSymbol, ArraySymbol] = Dictionary();
 		_scope                    : TableScope;
 
 		public this(scope: TableScope = null)
@@ -44,6 +45,13 @@ namespace NLiquid
 			Dictionary = Helpers.DefineSymbol.[DictionarySymbol]("dictionary", scope);
 
 			def named   = array[Nil : DeclarationSymbol, Double, Int, Boolean, String, Object, Dictionary];
+
+			// init dot net types
+			DotNetTypesMap.Add(Double,  TryGetSystemType(Double));
+			DotNetTypesMap.Add(Int,     TryGetSystemType(Int));
+			DotNetTypesMap.Add(Boolean, TryGetSystemType(Boolean));
+			DotNetTypesMap.Add(String,  TryGetSystemType(String));
+
 			def builder = ImmutableArray.CreateBuilder(named.Length);
 			builder.AddRange(named);
 
@@ -73,14 +81,45 @@ namespace NLiquid
 			}
 		}
 
+		public TryGetSystemType(typeSymbol: TypeSymbol) : System.Type
+		{
+			match (typeSymbol)
+			{
+				| IntSymbol       => typeof(int)
+				| DoubleSymbol    => typeof(double)
+				| StringSymbol    => typeof(string)
+				| BooleanSymbol   => typeof(bool)
+				| BooleanSymbol   => typeof(bool)
+				| _               => null
+			}
+		}
+
+		public GetDotNetArrayType(itemTypeSymbol: TypeSymbol) : System.Type
+		{
+			match (itemTypeSymbol)
+			{
+				| IntSymbol             => System.Type.GetType("System.Int32[]")
+				| DoubleSymbol          => System.Type.GetType("System.Double[]")
+				| StringSymbol          => System.Type.GetType("System.String[]")
+				| BooleanSymbol         => System.Type.GetType("System.Boolean[]")
+				| UserDefinedTypeSymbol => System.Type.GetType("System.Object[]")
+				| _                     => null
+			}
+		}
+
 		public GetArrayType(elemType : TypeSymbol) : ArraySymbol
 		{
-					mutable arraySymbol;
+			mutable arraySymbol;
 			when(!_arrayElemTypeMap.TryGetValue(elemType, out arraySymbol))
 			{
 				arraySymbol = Helpers.DefineSymbol.[ArraySymbol]($"array[$(elemType.Name)]", _scope);
 				arraySymbol.ElemType = elemType;
 				_arrayElemTypeMap.Add(elemType, arraySymbol);
+				// set .net array type
+				def arrayDotNetType = GetDotNetArrayType(elemType);
+				assert2(arrayDotNetType != null);
+				when(arrayDotNetType != null)
+					DotNetTypesMap.Add(arraySymbol, arrayDotNetType);
 			}
 			arraySymbol
 		}
