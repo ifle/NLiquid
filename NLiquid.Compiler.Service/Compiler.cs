@@ -42,8 +42,6 @@ namespace NLiquid.Compiler.Service
 
         void EmitTemplateMethod(IAst ast, TypeBuilder tb, NLiquidDependentPropertyEvalContext context)
         {
-	        TextWriter writer;
-
 			var file = ast.Location.Source.File;
             var templateName = Path.GetFileNameWithoutExtension(file.Name).Replace(".", "_").Replace("-", "_");
 
@@ -51,27 +49,37 @@ namespace NLiquid.Compiler.Service
 			// the first parameter of tempalte method is TextWriter
 	        var methodParameters = new List<ParameterExpression>{  Expression.Parameter(typeof(TextWriter), "writer") };
 
-			// comment parameter
-			var parameter = ((CompilationUnit)ast).Parameter;
-	        if (parameter.HasValue)
-	        {
-				var dotnetType = context.PredefinedTypes.GetDotNetType(parameter.Value.TypeRef.Symbol);
-				if(dotnetType != null)
-					methodParameters.Add(Expression.Parameter(dotnetType, parameter.Value.Name.Text));
-				else
-					Debug.Assert(false, $".NET Type for {parameter.Value.TypeRef.Symbol} is null");
-	        }
+			var commentParameter = EmitCommentParameter(ast, context);
+			if(commentParameter != null)
+				methodParameters.Add(commentParameter);
 
-			var templateMethod = Expression.Lambda(
+	        var templateMethod = Expression.Lambda(
 				Expression.Block(
 						//new []  { Expression.Variable(typeof(string), "igorvar") },
 						Expression.Call(methodParameters[0],
 							typeof(TextWriter).GetMethod("WriteLine", new [] { typeof(object) } ),
-							methodParameters.Count == 2 ? (Expression) methodParameters[1] : Expression.Constant("Hello"))
+							commentParameter != null ? (Expression) commentParameter : Expression.Constant("Hello"))
 					),
 				methodParameters
 				);
 	        templateMethod.CompileToMethod(methodBuilder);
         }
-    }
+
+		private static ParameterExpression EmitCommentParameter(IAst ast, NLiquidDependentPropertyEvalContext context)
+		{
+			ParameterExpression result = null;
+			var parameter = ((CompilationUnit) ast).Parameter;
+			if (parameter.HasValue)
+			{
+				var dotnetType = context.PredefinedTypes.GetDotNetType(parameter.Value.TypeRef.Symbol);
+				if (dotnetType != null)
+				{
+					result = Expression.Parameter(dotnetType, parameter.Value.Name.Text);
+				}
+				else
+					Debug.Assert(false, $".NET Type for {parameter.Value.TypeRef.Symbol} is null");
+			}
+			return result;
+		}
+	}
 }
