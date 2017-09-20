@@ -1,10 +1,11 @@
-using Nitra;
+﻿using Nitra;
 using Nitra.Declarations;
 using Nitra.Runtime;
 
 using NLiquid;
 
 using System.IO;
+using System.Globalization;
 using System.Collections.Immutable;
 
 using Newtonsoft.Json;
@@ -43,7 +44,7 @@ namespace NLiquid.Parser.Ast
 		in CurrentTable : TableScope;
 		in InsideLoopOrSwitch: LoopOrSwitch;
 
-		| Plain  { }
+		| Plain  { Value : string; }
 		| Comment { }
 		| Output
 		 {
@@ -220,38 +221,44 @@ namespace NLiquid.Parser.Ast
 	{
 		out Type        : TypeSymbol = context.GetGlobalTypes().Nil;
 		in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
-
+		in StringValue	: string;
+		in BooleanValue		: bool;
 		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
 			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
 
 		| True
 		{
-			Type = context.GetGlobalTypes().Boolean;
-			Value : bool;
+			Type 				= context.GetGlobalTypes().Boolean;
+			StringValue = "true";
 		}
 		| False
 		{
-			Type = context.GetGlobalTypes().Boolean;
-			Value : bool;
+			Type 				= context.GetGlobalTypes().Boolean;
+			StringValue = "false";
 		}
 		| Double
 		{
-			Type = context.GetGlobalTypes().Double;
+			Type 				= context.GetGlobalTypes().Double;
+			StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
 			Value : double;
+
 		}
 		| Int
 		{
-			Type = context.GetGlobalTypes().Int;
+			Type 				= context.GetGlobalTypes().Int;
+			StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
 			Value : int;
 		}
 		| SStr
 		{
-			Type = context.GetGlobalTypes().String;
+			Type 				= context.GetGlobalTypes().String;
+			StringValue = Value.Value;
 			Value : string;
 		}
 		| DStr
 		{
-			Type = context.GetGlobalTypes().String;
+			Type 				= context.GetGlobalTypes().String;
+			StringValue = Value.Value;
 			Value : string;
 		}
 		| SimpleReference

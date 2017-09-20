@@ -1,1 +1,3 @@
-﻿Hello {{ "Igor" }}!
+Hello {{ "DString" }}!
+Hello {{ 'SString' }}!
+Number {{ 5 }}

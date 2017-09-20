@@ -1,4 +1,4 @@
-using Nitra;
+﻿using Nitra;
 using Nitra.Declarations;
 using NLiquid.Parser.Syntax;
 using NLiquid.Parser.Ast;
@@ -17,7 +17,7 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Block -> Statement
 	{
-		| Plain  -> Plain {}
+		| Plain  -> Plain { Value = ParsedValue(Value, GetText(Value)); }
 		| Comment -> Comment {}
 		| Output -> Output { OutputExpr -> Expr; }
 		| If -> If
@@ -150,8 +150,8 @@ namespace NLiquid.Parser.Mapping
 
 	map syntax Grammar.Expr -> Expr
 	{
-		| True         -> True   { Value = ParsedValue(KwTrue, true); }
-		| False        -> False  { Value = ParsedValue(KwFalse, false); }
+		| True         -> True   {  }
+		| False        -> False  {  }
 		| Double       -> Double { Value = ParsedValue(Digits, double.Parse(GetText(Digits), CultureInfo.InvariantCulture)); }
 		| Int          -> Int    { Value = ParsedValue(Digits, int.Parse(GetText(Digits))); }
 		| SStr         -> SStr   { Value = ParsedValue(Value, GetText(Value)); }

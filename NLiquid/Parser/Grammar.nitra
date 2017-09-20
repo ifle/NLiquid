@@ -41,7 +41,7 @@ namespace NLiquid.Parser.Syntax
 
 		syntax Block
 		{
-			| Plain = (!TagStart Any)+
+			| Plain = Value = (!TagStart Any)+
 				{
 					regex TagStart = "{{" | "{%";
 				}
