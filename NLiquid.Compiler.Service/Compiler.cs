@@ -57,10 +57,10 @@ namespace NLiquid.Compiler.Service
 	        var textWriterParameter        = Expression.Parameter(typeof(TextWriter), "writer");
 			var variablesMap               = new Dictionary<LocalVariableSymbol,Expression>();
 			var statements                 = new List<Expression>();
-			
-			#region EmitWriteLineExpression
 
-			void EmitWriteLineStatement<T>(T value)
+			#region EmitTextWriteStatement
+
+			void EmitTextWriteStatement<T>(T value)
 			{
 				var valueType = typeof(T);
 
@@ -100,10 +100,10 @@ namespace NLiquid.Compiler.Service
 		        switch (statement)
 		        {
 			        case Statement.Plain plainStmt:
-						EmitWriteLineStatement<string>(plainStmt.Value.Value);
+						EmitTextWriteStatement<string>(plainStmt.Value.Value);
 				        break;
 			        case Statement.Output outputStmt:
-				        EmitWriteLineStatement<string>(outputStmt.Expr.StringValue);
+				        EmitTextWriteStatement<string>(outputStmt.Expr.StringValue);
 						break;
 			        case SimpleLocalVariable simpleLocalVariableStmt:
 				        break;
