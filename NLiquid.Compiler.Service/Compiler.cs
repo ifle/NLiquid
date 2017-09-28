@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.IO;
+using NLiquid.Filters;
 using NLiquid.Parser.Ast;
 
 namespace NLiquid.Compiler.Service
@@ -32,7 +33,6 @@ namespace NLiquid.Compiler.Service
 
 		NLiquidDependentPropertyEvalContext _context;
 		Dictionary<LocalVariableSymbol,Expression> _variablesMap;
-
 
 		public void Postprocessing(CancellationToken cancellationToken, Project project, ImmutableArray<Nemerle.Builtins.Tuple<IAst, bool>> asts, ProjectData data)
 		{
@@ -127,11 +127,12 @@ namespace NLiquid.Compiler.Service
 					_variablesMap.TryGetValue(simpleReferenceExpr.Ref.Symbol, out var value);
 					return value ?? Expression.Empty();
 				case Expr.MemberAccess memberAccessExpr:
-					break;
+					return Expression.Property(EmitExpression(memberAccessExpr.Qualifier), memberAccessExpr.PropertyRef.Name);
 				case Expr.ArrayAccess arrayAccessExpr:
-					break;
+					_variablesMap.TryGetValue(arrayAccessExpr.Ref.Symbol, out var arrValue);
+					return Expression.ArrayAccess(arrValue, EmitExpression(arrayAccessExpr.Index));
 				case Expr.Call callExpr:
-					break;
+					return EmitCallExpression(callExpr);
 				case Expr.Contains containsExpr:
 					break;
 				case Expr.And andExpr:
@@ -161,6 +162,7 @@ namespace NLiquid.Compiler.Service
 
 			return blockCollector;
 		}
+
 		private void EmitStatement(Statement statement, BlockCollector blockCollector)
 		{
 			switch (statement)
@@ -169,7 +171,7 @@ namespace NLiquid.Compiler.Service
 					EmitTextWriteStatement<string>(plainStmt.Value.Value, blockCollector);
 					break;
 				case Statement.Output outputStmt:
-					EmitTextWriteStatement<string>(outputStmt.Expr.StringValue, blockCollector);
+					EmitOutputStatement(outputStmt, blockCollector);
 					break;
 				case SimpleLocalVariable simpleLocalVariableStmt:
 					EmitSimpleLocalVariableStatement(simpleLocalVariableStmt, blockCollector);
@@ -191,6 +193,18 @@ namespace NLiquid.Compiler.Service
 					blockCollector.AddExpression(Expression.Empty());
 					break;
 			}
+		}
+
+		private void EmitOutputStatement(Statement.Output outputStmt, BlockCollector blockCollector)
+		{
+			var valExpr = EmitExpression(outputStmt.Expr);
+
+
+			var valueType = valExpr.Type;
+
+			if (!_writeTextWriteMethodInfoMap.TryGetValue(valueType, out var methodInfo))
+				methodInfo = _defaultTextWriteMethodInfo;
+			blockCollector.AddExpression(Expression.Call(_textWriterParameter, methodInfo, valExpr));
 		}
 
 		private void EmitTextWriteStatement<T>(T value, BlockCollector blockCollector)
@@ -243,6 +257,19 @@ namespace NLiquid.Compiler.Service
 			blockCollector.AddExpression(elseBody == null
 				? Expression.IfThen(EmitExpression(ifStmt.Condition), EmitStatement(ifStmt.Body).ToBlockExpression())
 				: Expression.IfThenElse(EmitExpression(ifStmt.Condition), EmitStatement(ifStmt.Body).ToBlockExpression(), elseBody));
+		}
+
+		private Expression EmitCallExpression(Expr.Call call)
+		{
+			if (call.FuncName.Ref.Symbol.FirstDeclarationOrDefault is FilterFunDeclaration filterDeclaration)
+			{
+				var args = new [] { EmitExpression(call.Arg0) }.Concat(call.Args.Select(expr => EmitExpression(expr))).ToArray();
+				if(args.Length > 0)
+					return Expression.Call(filterDeclaration.Method, args);
+				return Expression.Call(filterDeclaration.Method);
+			}
+
+			return Expression.Empty();
 		}
 	}
 }
