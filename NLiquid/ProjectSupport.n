@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 
 using Nemerle;
 using Nemerle.Collections;
@@ -60,7 +60,7 @@ namespace NLiquid
 			def filters         = FilterTypes.Create(globalTable, globalTypes);
 			def predefinedTypes = PredefinedTypes(globalTypes, filters);
 
-			def context = NLiquidDependentPropertyEvalContext(predefinedTypes);
+			def context = NLiquidDependentPropertyEvalContext(predefinedTypes, project);
 
 			predefinedTypes.AddDotNetTypes(LoadUserDefinedTypes(context, rootNamespace, project));
 

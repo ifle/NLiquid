@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -184,8 +185,10 @@ namespace NLiquid.Compiler.Service
 					EmitIfStatement(ifStmt, blockCollector);
 					break;
 				case For forStmt:
+					EmitForStatement(forStmt, blockCollector);
 					break;
 				case Statement.Break breakStmt:
+					//blockCollector.AddExpression(Expression.Return(Expression.la))
 					break;
 				case Statement.Continue continueStmt:
 					break;
@@ -257,6 +260,42 @@ namespace NLiquid.Compiler.Service
 			blockCollector.AddExpression(elseBody == null
 				? Expression.IfThen(EmitExpression(ifStmt.Condition), EmitStatement(ifStmt.Body).ToBlockExpression())
 				: Expression.IfThenElse(EmitExpression(ifStmt.Condition), EmitStatement(ifStmt.Body).ToBlockExpression(), elseBody));
+		}
+
+		private void EmitForStatement(For forStmtFor, BlockCollector blockCollector)
+		{
+			var forBlockCollector = new BlockCollector();
+			var collectionExpr = EmitExpression(forStmtFor.ForSource);
+			var elementType = _context.PredefinedTypes.GetDotNetType(forStmtFor.Symbol.Type);
+			var enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
+			var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
+
+			var enumeratorVar = Expression.Variable(enumeratorType, "enumerator");
+			var getEnumeratorCall = Expression.Call(collectionExpr, enumerableType.GetMethod("GetEnumerator", BindingFlags.Instance | BindingFlags.Public));
+			var enumeratorAssign = Expression.Assign(enumeratorVar, getEnumeratorCall);
+			blockCollector.AddVariable(enumeratorVar);
+			// The MoveNext method's actually on IEnumerator, not IEnumerator<T>
+			var moveNextCall = Expression.Call(enumeratorVar, typeof(IEnumerator).GetMethod("MoveNext", BindingFlags.Instance | BindingFlags.Public));
+			var breakLabel = Expression.Label("LoopBreak");
+
+			var loopVar = Expression.Variable(elementType, forStmtFor.Name.Text);
+			forBlockCollector.AddVariable(loopVar);
+			_variablesMap[forStmtFor.Symbol] = loopVar;
+			forBlockCollector.AddExpression(Expression.Assign(loopVar, Expression.Property(enumeratorVar, "Current")));
+			EmitStatement(forStmtFor.Body, forBlockCollector);
+
+			var loop = Expression.Block(new[] { enumeratorVar },
+				enumeratorAssign,
+				Expression.Loop(
+					Expression.IfThenElse(
+						Expression.Equal(moveNextCall, Expression.Constant(true)),
+						forBlockCollector.ToBlockExpression(),
+						Expression.Break(breakLabel)
+					),
+					breakLabel)
+			);
+
+			blockCollector.AddExpression(loop);
 		}
 
 		private Expression EmitCallExpression(Expr.Call call)
