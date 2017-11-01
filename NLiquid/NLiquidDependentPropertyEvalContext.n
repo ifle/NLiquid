@@ -19,10 +19,10 @@ namespace NLiquid
 	{
 		public PredefinedTypes: PredefinedTypes;
 
-		public this(symbolCache : ISymbolCache, predefinedTypes: PredefinedTypes)
+		public this(predefinedTypes: PredefinedTypes, project: Nitra.ProjectSystem.Project)
 		{
-		  base(symbolCache);
 			PredefinedTypes = predefinedTypes;
+			base(project);
 		}
 	}
 }

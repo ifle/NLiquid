@@ -20,7 +20,7 @@ using NLiquid.Parser.Ast;
 namespace NLiquid.Filters
 {
 	[Record]
-	class FilterFunDeclaration : ExternalDeclaration[DeclarationSymbol]
+	public class FilterFunDeclaration : ExternalDeclaration[DeclarationSymbol]
 	{
 		public Method : MethodInfo;
 		public override CreateSymbol() : DeclarationSymbol { FuncSymbol() }
