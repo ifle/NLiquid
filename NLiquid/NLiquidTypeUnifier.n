@@ -6,18 +6,20 @@ using Nitra.Declarations;
 
 namespace NLiquid
 {
-	class NLiquidTypeUnifier : TypeUnifier
-	{
-		public static Instance : NLiquidTypeUnifier = NLiquidTypeUnifier();
+  class NLiquidTypeUnifier : TypeUnifier
+  {
+    public new static Instance : NLiquidTypeUnifier { get { TypeUnifier.Instance :> NLiquidTypeUnifier } }
 
-		protected override IsSubtype(subtype : TypeSymbol, supertype : TypeSymbol) : bool
-		{
-			subtype.Equals(supertype);
-		}
+    static this() { TypeUnifier.Instance = NLiquidTypeUnifier(); }
 
-		public CreateTypeVar(): TypeVarSymbol
-		{
-			CreateTypeVar(null, null);
-		}
-	}
+    protected override IsSubtype(subtype : TypeSymbol, supertype : TypeSymbol) : bool
+    {
+      subtype.Equals(supertype);
+    }
+
+    public CreateTypeVar(): TypeVarSymbol
+    {
+      CreateTypeVar(null, null);
+    }
+  }
 }

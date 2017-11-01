@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 
 using Nemerle;
 using Nemerle.Collections;
@@ -25,7 +25,7 @@ using NLiquid.Filters;
 
 namespace NLiquid
 {
-	class ProjectSupport : IProjectSupport
+	public class ProjectSupport : IProjectSupport
 	{
 		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
 		static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
@@ -60,7 +60,7 @@ namespace NLiquid
 			def filters         = FilterTypes.Create(globalTable, globalTypes);
 			def predefinedTypes = PredefinedTypes(globalTypes, filters);
 
-			def context = NLiquidDependentPropertyEvalContext(predefinedTypes);
+			def context = NLiquidDependentPropertyEvalContext(project, predefinedTypes);
 
 			predefinedTypes.AddDotNetTypes(LoadUserDefinedTypes(context, rootNamespace, project));
 
