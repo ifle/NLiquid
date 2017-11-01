@@ -25,177 +25,177 @@ using NLiquid.Filters;
 
 namespace NLiquid
 {
-	public class ProjectSupport : IProjectSupport
-	{
-		static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
-		static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
-		static NoSpan : NSpan              = NSpan(0);
+  public class ProjectSupport : IProjectSupport
+  {
+    static NoLocation : Location       = Location(SourceSnapshot.Default.File, NSpan(0));
+    static NoFile : ProjectSystem.File = SourceSnapshot.Default.File;
+    static NoSpan : NSpan              = NSpan(0);
 
-		_postprocessing : IPostprocessing;
+    _postprocessing : IPostprocessing;
 
-		public this()
-		{
-			def currentAsmPath = Assembly.GetExecutingAssembly().Location;
-			def path = IO.Path.GetDirectoryName(currentAsmPath);
-			def pompilerPath = IO.Path.Combine(path, @"NLiquid.Compiler.Service.dll");
-			def compilerAsm = Assembly.LoadFrom(pompilerPath);
-			def itf = typeof(IPostprocessing);
-			def compilerType = compilerAsm.GetTypes().Where(t => t.IsClass && t.IsPublic && itf.IsAssignableFrom(t)).First();
-			_postprocessing = Activator.CreateInstance(compilerType) :> IPostprocessing;
-		}
+    public this()
+    {
+      def currentAsmPath = Assembly.GetExecutingAssembly().Location;
+      def path           = IO.Path.GetDirectoryName(currentAsmPath);
+      def pompilerPath   = IO.Path.Combine(path, @"NLiquid.Compiler.Service.dll");
+      def compilerAsm    = Assembly.LoadFrom(pompilerPath);
+      def itf            = typeof(IPostprocessing);
+      def compilerType   = compilerAsm.GetTypes().Where(t => t.IsClass && t.IsPublic && itf.IsAssignableFrom(t)).First();
+      _postprocessing    = Activator.CreateInstance(compilerType) :> IPostprocessing;
+    }
 
-		public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
-		{
-			IgnoreParams();
+    public RefreshReferences(cancellationToken : System.Threading.CancellationToken, project : Nitra.ProjectSystem.Project) : object
+    {
+      IgnoreParams();
 
-			def rootNamespace = NamespaceSymbol() <-
-			{
-				FullName = "<root>";
-				Kind = "root";
-			};
-			rootNamespace.AddDeclaration(ExternalDeclaration.[NamespaceSymbol](Name(NoLocation, "<root>")));
+      def rootNamespace = NamespaceSymbol() <-
+      {
+        FullName = "<root>";
+        Kind = "root";
+      };
+      rootNamespace.AddDeclaration(ExternalDeclaration.[NamespaceSymbol](Name(NoLocation, "<root>")));
 
-			def globalTable     = rootNamespace.MemberTable;
-			def globalTypes     = NLiquidGlobalTypes(globalTable);
-			def filters         = FilterTypes.Create(globalTable, globalTypes);
-			def predefinedTypes = PredefinedTypes(globalTypes, filters);
+      def globalTable     = rootNamespace.MemberTable;
+      def globalTypes     = NLiquidGlobalTypes(globalTable);
+      def filters         = FilterTypes.Create(globalTable, globalTypes);
+      def predefinedTypes = PredefinedTypes(globalTypes, filters);
 
-			def context = NLiquidDependentPropertyEvalContext(predefinedTypes, project);
+      def context = NLiquidDependentPropertyEvalContext(predefinedTypes, project);
 
-			predefinedTypes.AddDotNetTypes(LoadUserDefinedTypes(context, rootNamespace, project));
+      predefinedTypes.AddDotNetTypes(LoadUserDefinedTypes(context, rootNamespace, project));
 
-			ProjectData(context, rootNamespace)
-		}
+      ProjectData(context, rootNamespace)
+    }
 
-		public RefreshProject(cancellationToken : CancellationToken, files : ImmutableArray[FileEvalPropertiesData], data : object) : void
-		{
-			def (context, root) = DecomposeData(data);
-			context.CancellationToken = cancellationToken;
+    public RefreshProject(cancellationToken : CancellationToken, files : ImmutableArray[FileEvalPropertiesData], data : object) : void
+    {
+      def (context, root) = DecomposeData(data);
+      context.CancellationToken = cancellationToken;
 
-			when (cancellationToken.IsCancellationRequested)
-				return;
+      when (cancellationToken.IsCancellationRequested)
+        return;
 
-			def scope = root.MemberTable;
+      def scope = root.MemberTable;
 
-			foreach (file in files)
-				when (file.Ast is CompilationUnit as cu)
-					cu.Scope = scope;
+      foreach (file in files)
+        when (file.Ast is CompilationUnit as cu)
+          cu.Scope = scope;
 
-			def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedTypes.Symbols);
-			evalHost.EvalProperties(context, "Pass0", 0);
-			evalHost.EvalProperties(context, "Pass1", 1);
-		}
+      def evalHost = ProjectEvalPropertiesHost(files, context.PredefinedTypes.Symbols);
+      evalHost.EvalProperties(context, "Pass0", 0);
+      evalHost.EvalProperties(context, "Pass1", 1);
+    }
 
-		public Postprocessing(cancellationToken : CancellationToken, project : Project, asts : ImmutableArray[IAst * bool], data : object) : void
-		{
-			_postprocessing.Postprocessing(cancellationToken, project, asts, DecomposeData(data));
-		}
+    public Postprocessing(cancellationToken : CancellationToken, project : Project, asts : ImmutableArray[IAst * bool], data : object) : void
+    {
+      _postprocessing.Postprocessing(cancellationToken, project, asts, DecomposeData(data));
+    }
 
-		LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : Dictionary[TypeSymbol, System.Type]
-		{
-		  def systemTypeToTypeSymbolMap = Hashtable();
-		  def symbolTypeToSystemTypeMap = Dictionary();
-		  def globalTypes = context.PredefinedTypes.GlobalTypes;
-			def openNamespace(parent : NamespaceSymbol, name : string) : NamespaceSymbol
-			{
-				def r = Reference(Helpers.NoLocation, name);
-				def result = parent.MemberTable.Bind(r);
-				if (result.IsEmpty)
-					Helpers.DefineSymbol.[NamespaceSymbol](name, parent.MemberTable, context);
-				else
-				{
-					def symbols = result.GetSymbols();
-					assert2(symbols.Length == 1);
-					symbols[0]
-				}
-			}
-			def tryAddType(type : System.Type) : TypeSymbol
-			{
-			  mutable existsSymbol;
-			  when (systemTypeToTypeSymbolMap.TryGetValue(type, out existsSymbol))
-					return existsSymbol;
+    LoadUserDefinedTypes(context : NLiquidDependentPropertyEvalContext, globalNamespace : NamespaceSymbol, project : Nitra.ProjectSystem.Project) : Dictionary[TypeSymbol, System.Type]
+    {
+      def systemTypeToTypeSymbolMap = Hashtable();
+      def symbolTypeToSystemTypeMap = Dictionary();
+      def globalTypes = context.PredefinedTypes.GlobalTypes;
+      def openNamespace(parent : NamespaceSymbol, name : string) : NamespaceSymbol
+      {
+        def r = Reference(Helpers.NoLocation, name);
+        def result = parent.MemberTable.Bind(r);
+        if (result.IsEmpty)
+          Helpers.DefineSymbol.[NamespaceSymbol](name, parent.MemberTable, context);
+        else
+        {
+          def symbols = result.GetSymbols();
+          assert2(symbols.Length == 1);
+          symbols[0]
+        }
+      }
+      def tryAddType(type : System.Type) : TypeSymbol
+      {
+        mutable existsSymbol;
+        when (systemTypeToTypeSymbolMap.TryGetValue(type, out existsSymbol))
+          return existsSymbol;
 
-			  when (type.IsSpecialName || !type.IsPublic || !(type.IsClass || type.IsValueType) || type.IsEnum && type.GetGenericArguments().Length > 0)
-			  {
-					return null;
-				}
+        when (type.IsSpecialName || !type.IsPublic || !(type.IsClass || type.IsValueType) || type.IsEnum && type.GetGenericArguments().Length > 0)
+        {
+          return null;
+        }
 
-				def predefinedOpt = globalTypes.TryGetSymbol(type);
-				when (predefinedOpt != null)
-				{
-				  systemTypeToTypeSymbolMap.Add(type, predefinedOpt);
-				  symbolTypeToSystemTypeMap.Add(predefinedOpt, type);
-				  return predefinedOpt;
-				}
+        def predefinedOpt = globalTypes.TryGetSymbol(type);
+        when (predefinedOpt != null)
+        {
+          systemTypeToTypeSymbolMap.Add(type, predefinedOpt);
+          symbolTypeToSystemTypeMap.Add(predefinedOpt, type);
+          return predefinedOpt;
+        }
 
-				def nsPath = type.Namespace.Split('.');
-				mutable ns = globalNamespace;
-				foreach (name in nsPath)
-					ns = openNamespace(ns, name);
-				def r = Reference(Helpers.NoLocation, type.Name);
-				def result = ns.MemberTable.Bind(r);
-				if (result.IsEmpty)
-				{
-					def symbol = Helpers.DefineSymbol.[UserDefinedTypeSymbol](type.Name, ns.MemberTable, context);
-					systemTypeToTypeSymbolMap.Add(type, symbol);
-					symbolTypeToSystemTypeMap.Add(symbol, type);
-					def properties = type.GetProperties();
-					foreach (prop when prop.CanRead && !prop.IsSpecialName in properties)
-					{
-					  def getter = prop.GetGetMethod();
-					  def attr = getter.Attributes;
-					  when (getter.GetParameters().Length != 0 && !(attr %&& MethodAttributes.Public) && attr %&& MethodAttributes.Static)
-							continue;
-						def propTypeSymbol = tryAddType(prop.PropertyType);
-						when (propTypeSymbol == null)
-							continue;
-						def propSymbol = Helpers.DefineSymbol.[PropertySymbol](prop.Name, symbol.MemberTable);
-						propSymbol.Type = propTypeSymbol;
-					}
-					symbol // for debug purpose
-				}
-				else
-				{
-					def symbols = result.GetSymbols();
-					assert2(symbols.Length == 1);
-					symbols[0]
-				}
-			}
+        def nsPath = type.Namespace.Split('.');
+        mutable ns = globalNamespace;
+        foreach (name in nsPath)
+          ns = openNamespace(ns, name);
+        def r = Reference(Helpers.NoLocation, type.Name);
+        def result = ns.MemberTable.Bind(r);
+        if (result.IsEmpty)
+        {
+          def symbol = Helpers.DefineSymbol.[UserDefinedTypeSymbol](type.Name, ns.MemberTable, context);
+          systemTypeToTypeSymbolMap.Add(type, symbol);
+          symbolTypeToSystemTypeMap.Add(symbol, type);
+          def properties = type.GetProperties();
+          foreach (prop when prop.CanRead && !prop.IsSpecialName in properties)
+          {
+            def getter = prop.GetGetMethod();
+            def attr = getter.Attributes;
+            when (getter.GetParameters().Length != 0 && !(attr %&& MethodAttributes.Public) && attr %&& MethodAttributes.Static)
+              continue;
+            def propTypeSymbol = tryAddType(prop.PropertyType);
+            when (propTypeSymbol == null)
+              continue;
+            def propSymbol = Helpers.DefineSymbol.[PropertySymbol](prop.Name, symbol.MemberTable);
+            propSymbol.Type = propTypeSymbol;
+          }
+          symbol // for debug purpose
+        }
+        else
+        {
+          def symbols = result.GetSymbols();
+          assert2(symbols.Length == 1);
+          symbols[0]
+        }
+      }
 
-			foreach (lib in project.Libs)
-			{
-			  def asm = Assembly.LoadFrom(lib.Path);
-			  def types = asm.GetTypes();
-			  foreach (type in types)
-			  {
-			    def typeSymbol = tryAddType(type);
-			    _ = typeSymbol;
-			  }
-			}
+      foreach (lib in project.Libs)
+      {
+        def asm = Assembly.LoadFrom(lib.Path);
+        def types = asm.GetTypes();
+        foreach (type in types)
+        {
+          def typeSymbol = tryAddType(type);
+          _ = typeSymbol;
+        }
+      }
 
-			symbolTypeToSystemTypeMap;
-		}
+      symbolTypeToSystemTypeMap;
+    }
 
-		public DeconstructType(symbol : DeclarationSymbol, _type : out TypeSymbol, typeArgs : out ImmutableArray[TypeSymbol]) : bool
-		{
-			IgnoreParams();
-			false
-		}
+    public DeconstructType(symbol : DeclarationSymbol, _type : out TypeSymbol, typeArgs : out ImmutableArray[TypeSymbol]) : bool
+    {
+      IgnoreParams();
+      false
+    }
 
-		public GetSymbolById(data : object, symbolId : int) : ValueOption[DeclarationSymbol]
-		{
-			IgnoreParams();
-			VNone()
-		}
+    public GetSymbolById(data : object, symbolId : int) : ValueOption[DeclarationSymbol]
+    {
+      IgnoreParams();
+      VNone()
+    }
 
-		public VisitGlobalSymbols(data : object, callback : Predicate[DeclarationSymbol]) : void
-		{
-			IgnoreParams();
-		}
+    public VisitGlobalSymbols(data : object, callback : Predicate[DeclarationSymbol]) : void
+    {
+      IgnoreParams();
+    }
 
-		DecomposeData(data : object) : ProjectData
-		{
-			data :> ProjectData
-		}
-	}
+    DecomposeData(data : object) : ProjectData
+    {
+      data :> ProjectData
+    }
+  }
 }

@@ -9,19 +9,19 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-	[FilterSource]
-	public class NumberFilters
-	{
-		[Filter("round")]
-		public static Round(val: double): double
-		{
-			Math.Round(val);
-		}
+  [FilterSource]
+  public class NumberFilters
+  {
+    [Filter("round")]
+    public static Round(val: double): double
+    {
+      Math.Round(val);
+    }
 
-		[Filter("round")]
-		public static Round(val: double, digits: int): double
-		{
-			Math.Round(val, digits);
-		}
-	}
+    [Filter("round")]
+    public static Round(val: double, digits: int): double
+    {
+      Math.Round(val, digits);
+    }
+  }
 }

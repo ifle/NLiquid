@@ -2,13 +2,13 @@
 
 namespace Models
 {
-	public class Customer
-	{
-		public string Name { get; }
+  public class Customer
+  {
+    public string Name { get; }
 
-		public Customer(string name)
-		{
-			Name = name ?? throw new ArgumentNullException(nameof(name));
-		}
-	}
+    public Customer(string name)
+    {
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+    }
+  }
 }

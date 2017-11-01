@@ -15,14 +15,14 @@ using NLiquid.Parser.Ast;
 
 namespace NLiquid
 {
-	public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
-	{
-		public PredefinedTypes: PredefinedTypes;
+  public class NLiquidDependentPropertyEvalContext : DependentPropertyEvalContext
+  {
+    public PredefinedTypes: PredefinedTypes;
 
-		public this(predefinedTypes: PredefinedTypes, project: Nitra.ProjectSystem.Project)
-		{
-			PredefinedTypes = predefinedTypes;
-			base(project);
-		}
-	}
+    public this(predefinedTypes: PredefinedTypes, project: Nitra.ProjectSystem.Project)
+    {
+      PredefinedTypes = predefinedTypes;
+      base(project);
+    }
+  }
 }

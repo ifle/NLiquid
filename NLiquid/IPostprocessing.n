@@ -13,8 +13,8 @@ using System.Linq;
 
 namespace NLiquid
 {
-	public interface IPostprocessing
-	{
-		Postprocessing(cancellationToken : CancellationToken, project : Project, asts : ImmutableArray[IAst * bool], data : ProjectData) : void
-	}
+  public interface IPostprocessing
+  {
+    Postprocessing(cancellationToken : CancellationToken, project : Project, asts : ImmutableArray[IAst * bool], data : ProjectData) : void
+  }
 }

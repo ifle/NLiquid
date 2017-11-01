@@ -9,10 +9,10 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-	[Record]
-	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-	public class FilterAttribute: Attribute
-	{
-		public Name : string { get; }
-	}
+  [Record]
+  [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+  public class FilterAttribute: Attribute
+  {
+    public Name : string { get; }
+  }
 }

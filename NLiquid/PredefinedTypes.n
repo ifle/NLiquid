@@ -1,4 +1,4 @@
-using Nemerle;
+﻿using Nemerle;
 using Nemerle.Collections;
 using Nemerle.Text;
 using Nemerle.Utility;
@@ -17,41 +17,41 @@ using NLiquid.Filters;
 
 namespace NLiquid
 {
-	public class PredefinedTypes
-	{
-		public GlobalTypes: NLiquidGlobalTypes;
-		public Filters: FilterTypes;
-		public DotNetTypesMap: Dictionary[TypeSymbol, System.Type] = Dictionary();
-		public Symbols: ImmutableArray[DeclarationSymbol];
+  public class PredefinedTypes
+  {
+    public GlobalTypes: NLiquidGlobalTypes;
+    public Filters: FilterTypes;
+    public DotNetTypesMap: Dictionary[TypeSymbol, System.Type] = Dictionary();
+    public Symbols: ImmutableArray[DeclarationSymbol];
 
-		public this(globalTypes: NLiquidGlobalTypes, filters: FilterTypes)
-		{
-			GlobalTypes = globalTypes;
-			Filters     = filters;
-			DotNetTypesMap = Dictionary();
-			def builder = ImmutableArray.CreateBuilder(globalTypes.Types.Length + filters.Filters.Length);
-			builder.AddRange(globalTypes.Types);
-			builder.AddRange(filters.Filters);
-			AddDotNetTypes(GlobalTypes.DotNetTypesMap);
-			Symbols = builder.ToImmutableArray();
-		}
+    public this(globalTypes: NLiquidGlobalTypes, filters: FilterTypes)
+    {
+      GlobalTypes = globalTypes;
+      Filters     = filters;
+      DotNetTypesMap = Dictionary();
+      def builder = ImmutableArray.CreateBuilder(globalTypes.Types.Length + filters.Filters.Length);
+      builder.AddRange(globalTypes.Types);
+      builder.AddRange(filters.Filters);
+      AddDotNetTypes(GlobalTypes.DotNetTypesMap);
+      Symbols = builder.ToImmutableArray();
+    }
 
-		public AddDotNetTypes(types: Dictionary[TypeSymbol, System.Type]): void
-		{
-			when(types != null)
-			{
-			    foreach(type in types)
-			    {
-						DotNetTypesMap[type.Key] = type.Value;
-			    }
-			}
+    public AddDotNetTypes(types: Dictionary[TypeSymbol, System.Type]): void
+    {
+      when(types != null)
+      {
+        foreach(type in types)
+        {
+          DotNetTypesMap[type.Key] = type.Value;
+        }
+      }
 
-		}
-		public GetDotNetType(typeSymbol: TypeSymbol): System.Type
-		{
-				mutable type: System.Type;
-		    def _ = DotNetTypesMap.TryGetValue(typeSymbol, out type);
-		    type;
-		}
-	}
+    }
+    public GetDotNetType(typeSymbol: TypeSymbol): System.Type
+    {
+      mutable type: System.Type;
+      def _ = DotNetTypesMap.TryGetValue(typeSymbol, out type);
+      type;
+    }
+  }
 }

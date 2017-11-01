@@ -3,10 +3,10 @@
 
 root = true
 
-[*.{nitra,n}]
+[*]
 end_of_line = crlf
 charset = utf-8-bom
 insert_final_newline = true
 trim_trailing_whitespace = true
-indent_style = tab
+indent_style = space
 indent_size = 2

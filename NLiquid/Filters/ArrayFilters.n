@@ -9,136 +9,136 @@ using System.Linq;
 
 namespace NLiquid.Filters
 {
-	[FilterSource]
-	public class ArrayFilters
-	{
-		[Filter("join")]
-		public static Join(val : array[string], delimiter : string): string
-		{
-			string.Join(delimiter, val);
-		}
+  [FilterSource]
+  public class ArrayFilters
+  {
+    [Filter("join")]
+    public static Join(val : array[string], delimiter : string): string
+    {
+      string.Join(delimiter, val);
+    }
 
-		[Filter("join")]
-		public static Join(val: array[double], delimiter: string): string
-		{
-			string.Join(delimiter, val);
-		}
+    [Filter("join")]
+    public static Join(val: array[double], delimiter: string): string
+    {
+      string.Join(delimiter, val);
+    }
 
-		[Filter("join")]
-		public static Join(val : array[int], delimiter : string): string
-		{
-			string.Join(delimiter, val);
-		}
+    [Filter("join")]
+    public static Join(val : array[int], delimiter : string): string
+    {
+      string.Join(delimiter, val);
+    }
 
-		[Filter("join")]
-		public static Join(val : array[bool], delimiter : string): string
-		{
-			string.Join(delimiter, val);
-		}
+    [Filter("join")]
+    public static Join(val : array[bool], delimiter : string): string
+    {
+      string.Join(delimiter, val);
+    }
 
-		[Filter("join")]
-		public static Join(val : array[object], delimiter : string): string
-		{
-			string.Join(delimiter, val);
-		}
-
-
-		[Filter("split")]
-		public static Split(val : string, delimiter : string): array[string]
-		{
-		    val.Split(array[delimiter], StringSplitOptions.RemoveEmptyEntries)
-		}
+    [Filter("join")]
+    public static Join(val : array[object], delimiter : string): string
+    {
+      string.Join(delimiter, val);
+    }
 
 
-		[Filter("limit")]
-		public static Limit(val : array[string], limit : int): array[string]
-		{
-			val.Take(limit).ToArray();
-		}
-
-		[Filter("limit")]
-		public static Limit(val : array[double], limit : int): array[double]
-		{
-			val.Take(limit).ToArray();
-		}
-
-		[Filter("limit")]
-		public static Limit(val : array[int], limit : int): array[int]
-		{
-			val.Take(limit).ToArray();
-		}
-
-		[Filter("limit")]
-		public static Limit(val : array[bool], limit : int): array[bool]
-		{
-			val.Take(limit).ToArray();
-		}
-
-		[Filter("limit")]
-		public static Limit(val : array[object], limit : int): array[object]
-		{
-			val.Take(limit).ToArray();
-		}
-
-		[Filter("offset")]
-		public static Offset(val : array[string], offset : int): array[string]
-		{
-			val.Skip(offset).ToArray();
-		}
-
-		[Filter("offset")]
-		public static Offset(val : array[double], offset : int): array[double]
-		{
-			val.Skip(offset).ToArray();
-		}
-
-		[Filter("offset")]
-		public static Offset(val : array[int], offset : int): array[int]
-		{
-			val.Skip(offset).ToArray();
-		}
-
-		[Filter("offset")]
-		public static Offset(val : array[bool], offset : int): array[bool]
-		{
-			val.Skip(offset).ToArray();
-		}
-
-		[Filter("offset")]
-		public static Offset(val : array[object], offset : int): array[object]
-		{
-			val.Skip(offset).ToArray();
-		}
+    [Filter("split")]
+    public static Split(val : string, delimiter : string): array[string]
+    {
+      val.Split(array[delimiter], StringSplitOptions.RemoveEmptyEntries)
+    }
 
 
-		[Filter("reversed")]
-		public static Reversed(val : array[string]): array[string]
-		{
-			val.Reverse().ToArray();
-		}
+    [Filter("limit")]
+    public static Limit(val : array[string], limit : int): array[string]
+    {
+      val.Take(limit).ToArray();
+    }
 
-		[Filter("reversed")]
-		public static Reversed(val : array[double]): array[double]
-		{
-			val.Reverse().ToArray();
-		}
+    [Filter("limit")]
+    public static Limit(val : array[double], limit : int): array[double]
+    {
+      val.Take(limit).ToArray();
+    }
 
-		[Filter("reversed")]
-		public static Reversed(val : array[int]): array[int]
-		{
-			val.Reverse().ToArray();
-		}
+    [Filter("limit")]
+    public static Limit(val : array[int], limit : int): array[int]
+    {
+      val.Take(limit).ToArray();
+    }
 
-		[Filter("reversed")]
-		public static Reversed(val : array[bool]): array[bool]
-		{
-			val.Reverse().ToArray();
-		}
+    [Filter("limit")]
+    public static Limit(val : array[bool], limit : int): array[bool]
+    {
+      val.Take(limit).ToArray();
+    }
 
-		[Filter("reversed")]
-		public static Offset(val : array[object]): array[object]
-		{
-			val.Reverse().ToArray();
-		}
-	}
+    [Filter("limit")]
+    public static Limit(val : array[object], limit : int): array[object]
+    {
+      val.Take(limit).ToArray();
+    }
+
+    [Filter("offset")]
+    public static Offset(val : array[string], offset : int): array[string]
+    {
+      val.Skip(offset).ToArray();
+    }
+
+    [Filter("offset")]
+    public static Offset(val : array[double], offset : int): array[double]
+    {
+      val.Skip(offset).ToArray();
+    }
+
+    [Filter("offset")]
+    public static Offset(val : array[int], offset : int): array[int]
+    {
+      val.Skip(offset).ToArray();
+    }
+
+    [Filter("offset")]
+    public static Offset(val : array[bool], offset : int): array[bool]
+    {
+      val.Skip(offset).ToArray();
+    }
+
+    [Filter("offset")]
+    public static Offset(val : array[object], offset : int): array[object]
+    {
+      val.Skip(offset).ToArray();
+    }
+
+
+    [Filter("reversed")]
+    public static Reversed(val : array[string]): array[string]
+    {
+      val.Reverse().ToArray();
+    }
+
+    [Filter("reversed")]
+    public static Reversed(val : array[double]): array[double]
+    {
+      val.Reverse().ToArray();
+    }
+
+    [Filter("reversed")]
+    public static Reversed(val : array[int]): array[int]
+    {
+      val.Reverse().ToArray();
+    }
+
+    [Filter("reversed")]
+    public static Reversed(val : array[bool]): array[bool]
+    {
+      val.Reverse().ToArray();
+    }
+
+    [Filter("reversed")]
+    public static Offset(val : array[object]): array[object]
+    {
+      val.Reverse().ToArray();
+    }
+  }
 }

@@ -13,399 +13,399 @@ using Newtonsoft.Json.Linq;
 
 namespace NLiquid.Parser.Ast
 {
-	ast CompilationUnit : BindableAst, LocalVariableScope
-	{
-		Statements.CurrentTable   = LocalVariables;
-		Statements.Scope          = Scope.HideWith(LocalVariables);
-		Parameter.Scope           = Scope;
-		Parameter.ContainingTable = LocalVariables;
+  ast CompilationUnit : BindableAst, LocalVariableScope
+  {
+    Statements.CurrentTable   = LocalVariables;
+    Statements.Scope          = Scope.HideWith(LocalVariables);
+    Parameter.Scope           = Scope;
+    Parameter.ContainingTable = LocalVariables;
 
-		Parameter : Parameter?;
-		Statements : Statement*;
-	}
+    Parameter : Parameter?;
+    Statements : Statement*;
+  }
 
-	declaration Parameter : BindableAst, LocalVariable
-	{
-		out TypeRef : Ref[TypeSymbol] = Type.Ref.Resolve();
+  declaration Parameter : BindableAst, LocalVariable
+  {
+    out TypeRef : Ref[TypeSymbol] = Type.Ref.Resolve();
 
-		Type.Scope = Scope;
-		Symbol.Type = TypeRef.Symbol;
+    Type.Scope = Scope;
+    Symbol.Type = TypeRef.Symbol;
 
-		Type : QualifiedReference;
-	}
+    Type : QualifiedReference;
+  }
 
-	abstract ast LocalVariableScope
-	{
-		out LocalVariables : TableScope = TableScope("Local variables");
-	}
+  abstract ast LocalVariableScope
+  {
+    out LocalVariables : TableScope = TableScope("Local variables");
+  }
 
-	abstract ast Statement : BindableAst
-	{
-		in CurrentTable : TableScope;
-		in InsideLoopOrSwitch: LoopOrSwitch;
+  abstract ast Statement : BindableAst
+  {
+    in CurrentTable : TableScope;
+    in InsideLoopOrSwitch: LoopOrSwitch;
 
-		| Plain  { Value : string; }
-		| Comment { }
-		| Output
-		 {
-			Expr.Scope = Scope;
+    | Plain  { Value : string; }
+    | Comment { }
+    | Output
+     {
+      Expr.Scope = Scope;
 
-			Expr : Expr;
-		 }
-		| If : LocalVariableScope
-		{
-			CurrentTable         = LocalVariables;
-			Body.CurrentTable    = CurrentTable;
-			ElseIfs.CurrentTable = CurrentTable;
-			Else.CurrentTable    = CurrentTable;
-			Body.Scope           = Scope.HideWith(LocalVariables);
-			Condition.Scope      = Scope;
-			ElseIfs.Scope        = Scope;
-			Else.Scope           = Scope;
+      Expr : Expr;
+     }
+    | If : LocalVariableScope
+    {
+      CurrentTable         = LocalVariables;
+      Body.CurrentTable    = CurrentTable;
+      ElseIfs.CurrentTable = CurrentTable;
+      Else.CurrentTable    = CurrentTable;
+      Body.Scope           = Scope.HideWith(LocalVariables);
+      Condition.Scope      = Scope;
+      ElseIfs.Scope        = Scope;
+      Else.Scope           = Scope;
 
-			Body.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
-			ElseIfs.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
-			Else.InsideLoopOrSwitch 	= InsideLoopOrSwitch;
+      Body.InsideLoopOrSwitch   = InsideLoopOrSwitch;
+      ElseIfs.InsideLoopOrSwitch   = InsideLoopOrSwitch;
+      Else.InsideLoopOrSwitch   = InsideLoopOrSwitch;
 
-			Condition : Expr;
-			Body      : Statement*;
-			ElseIfs   : ElseIf*;
-			Else      : Else?;
-		}
-		| Unless : LocalVariableScope
-		{
-			CurrentTable      = LocalVariables;
-			Body.CurrentTable = CurrentTable;
-			Body.Scope        = Scope.HideWith(LocalVariables);
-			Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
-			Condition.Scope   = Scope;
+      Condition : Expr;
+      Body      : Statement*;
+      ElseIfs   : ElseIf*;
+      Else      : Else?;
+    }
+    | Unless : LocalVariableScope
+    {
+      CurrentTable      = LocalVariables;
+      Body.CurrentTable = CurrentTable;
+      Body.Scope        = Scope.HideWith(LocalVariables);
+      Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
+      Condition.Scope   = Scope;
 
-			Condition : Expr;
-			Body      : Statement*;
-		}
-		| Break : Jumpable
-		{
+      Condition : Expr;
+      Body      : Statement*;
+    }
+    | Break : Jumpable
+    {
 
-		}
-		| Continue : Jumpable
-		{
+    }
+    | Continue : Jumpable
+    {
 
-		}
-	}
+    }
+  }
 
-	abstract ast Jumpable : Statement
-	{
-		unless(this.IsInsideLoopOrSwitchEvaluated)
-			Error(context, "No enclosing loop out of which to break or continue");
-	}
+  abstract ast Jumpable : Statement
+  {
+    unless(this.IsInsideLoopOrSwitchEvaluated)
+      Error(context, "No enclosing loop out of which to break or continue");
+  }
 
-	ast ElseIf : Statement, LocalVariableScope
-	{
-		CurrentTable      = LocalVariables;
-		Body.CurrentTable = CurrentTable;
-		Body.Scope        = Scope.HideWith(LocalVariables);
-		Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
-		Condition.Scope   = Scope;
+  ast ElseIf : Statement, LocalVariableScope
+  {
+    CurrentTable      = LocalVariables;
+    Body.CurrentTable = CurrentTable;
+    Body.Scope        = Scope.HideWith(LocalVariables);
+    Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
+    Condition.Scope   = Scope;
 
-		Condition : Expr;
-		Body      : Statement*;
-	}
+    Condition : Expr;
+    Body      : Statement*;
+  }
 
-	ast Else : Statement, LocalVariableScope
-	{
-		CurrentTable      = LocalVariables;
-		Body.CurrentTable = CurrentTable;
-		Body.Scope        = Scope.HideWith(LocalVariables);
-		Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
-		Body: Statement*;
-	}
+  ast Else : Statement, LocalVariableScope
+  {
+    CurrentTable      = LocalVariables;
+    Body.CurrentTable = CurrentTable;
+    Body.Scope        = Scope.HideWith(LocalVariables);
+    Body.InsideLoopOrSwitch = InsideLoopOrSwitch;
+    Body: Statement*;
+  }
 
-	abstract declaration LocalVariable
-	{
-		symbol
-		{
-			in Type : TypeSymbol;
-		}
-	}
+  abstract declaration LocalVariable
+  {
+    symbol
+    {
+      in Type : TypeSymbol;
+    }
+  }
 
-	declaration SimpleLocalVariable : Statement, LocalVariable
-	{
-		ContainingTable   = CurrentTable;
-		Symbol.Kind       = "assigment";
-		Symbol.Type       = Initializer.Type;
-		Initializer.Scope = Scope;
+  declaration SimpleLocalVariable : Statement, LocalVariable
+  {
+    ContainingTable   = CurrentTable;
+    Symbol.Kind       = "assigment";
+    Symbol.Type       = Initializer.Type;
+    Initializer.Scope = Scope;
 
-		Initializer : Expr;
-	}
+    Initializer : Expr;
+  }
 
-	declaration CaptureLocalVariable : Statement, LocalVariable
-	{
-		ContainingTable   = CurrentTable;
-		Symbol.Kind       = "capture";
-		Symbol.Type       = context.GetGlobalTypes().String;
-		Body.Scope        = Scope;
+  declaration CaptureLocalVariable : Statement, LocalVariable
+  {
+    ContainingTable   = CurrentTable;
+    Symbol.Kind       = "capture";
+    Symbol.Type       = context.GetGlobalTypes().String;
+    Body.Scope        = Scope;
 
-		Body: Statement*;
-	}
+    Body: Statement*;
+  }
 
-	declaration JObjectVariable : Statement, LocalVariable
-	{
-	/*
-		symbol
-		{
-			in Data : JObject;
-		}*/
-		ContainingTable   = CurrentTable;
-		Symbol.Kind       = "object";
-		//Symbol.Type       = context.GetGlobalTypes().Object;
-		//Symbol.Data				= JObject.Parse(Initializer.GetText(Digits));
-		Initializer.Scope = Scope;
+  declaration JObjectVariable : Statement, LocalVariable
+  {
+  /*
+    symbol
+    {
+      in Data : JObject;
+    }*/
+    ContainingTable   = CurrentTable;
+    Symbol.Kind       = "object";
+    //Symbol.Type       = context.GetGlobalTypes().Object;
+    //Symbol.Data        = JObject.Parse(Initializer.GetText(Digits));
+    Initializer.Scope = Scope;
 
-		Initializer : Expr;
-	}
+    Initializer : Expr;
+  }
 
-	declaration For : Statement, LocalVariable, LocalVariableScope, LoopOrSwitch
-	{
-		Symbol.Kind         = "for";
-		Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
-		ForSource.Scope     = Scope;
-		ContainingTable     = LocalVariables;
-		CurrentTable        = LocalVariables;
-		Body.Scope          = Scope.HideWith(LocalVariables);
-		Body.CurrentTable   = CurrentTable;
-		Body.InsideLoopOrSwitch = this;
+  declaration For : Statement, LocalVariable, LocalVariableScope, LoopOrSwitch
+  {
+    Symbol.Kind         = "for";
+    Symbol.Type         = context.GetGlobalTypes().GetArrayElemType(ForSource.Type);
+    ForSource.Scope     = Scope;
+    ContainingTable     = LocalVariables;
+    CurrentTable        = LocalVariables;
+    Body.Scope          = Scope.HideWith(LocalVariables);
+    Body.CurrentTable   = CurrentTable;
+    Body.InsideLoopOrSwitch = this;
 
-		ForSource : Expr;
-		Body      : Statement*;
-	}
+    ForSource : Expr;
+    Body      : Statement*;
+  }
 
-	abstract ast LoopOrSwitch
-	{
+  abstract ast LoopOrSwitch
+  {
 
-	}
+  }
 
-	abstract ast Binary : Expr
-	{
-		Expr1.Scope = Scope;
-		Expr2.Scope = Scope;
+  abstract ast Binary : Expr
+  {
+    Expr1.Scope = Scope;
+    Expr2.Scope = Scope;
 
-		Expr1 : Expr;
-		Expr2 : Expr;
-	}
+    Expr1 : Expr;
+    Expr2 : Expr;
+  }
 
-	abstract ast SameTypesExpr : Binary
-	{
-		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, Expr2.Type))
-			Expr2.Error(context, $"$(self.Expr2.Type) is not compatible with $(self.Expr1.Type).");
-	}
+  abstract ast SameTypesExpr : Binary
+  {
+    unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, Expr2.Type))
+      Expr2.Error(context, $"$(self.Expr2.Type) is not compatible with $(self.Expr1.Type).");
+  }
 
-	abstract ast EqualExpr : SameTypesExpr
-	{
-		Type = context.GetGlobalTypes().Boolean;
-	}
+  abstract ast EqualExpr : SameTypesExpr
+  {
+    Type = context.GetGlobalTypes().Boolean;
+  }
 
-	abstract ast OrAndExpr : SameTypesExpr
-	{
-		Type = context.GetGlobalTypes().Boolean;
-	}
+  abstract ast OrAndExpr : SameTypesExpr
+  {
+    Type = context.GetGlobalTypes().Boolean;
+  }
 
-	abstract ast ContainsExpr : SameTypesExpr
-	{
-		Type = context.GetGlobalTypes().Boolean;
+  abstract ast ContainsExpr : SameTypesExpr
+  {
+    Type = context.GetGlobalTypes().Boolean;
 
-		unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetGlobalTypes().String))
-			Expr1.Error(context, $"Expected string expression but found $(self.Expr1.Type).");
-	}
+    unless (NLiquidTypeUnifier.Instance.TryUnify(Expr1.Type, context.GetGlobalTypes().String))
+      Expr1.Error(context, $"Expected string expression but found $(self.Expr1.Type).");
+  }
 
-	abstract ast Expr : BindableAst
-	{
-		out Type        : TypeSymbol = context.GetGlobalTypes().Nil;
-		in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
-		in StringValue	: string;
-		in BooleanValue		: bool;
-		unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
-			Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
+  abstract ast Expr : BindableAst
+  {
+    out Type        : TypeSymbol = context.GetGlobalTypes().Nil;
+    in ExpectedType : TypeSymbol = NLiquidTypeUnifier.Instance.CreateTypeVar();
+    in StringValue  : string;
+    in BooleanValue    : bool;
+    unless (NLiquidTypeUnifier.Instance.TryUnify(Type, ExpectedType))
+      Error(context, $"Expected $(self.ExpectedType) but got $(self.Type)");
 
-		| True
-		{
-			Type 				= context.GetGlobalTypes().Boolean;
-			StringValue = "true";
-		}
-		| False
-		{
-			Type 				= context.GetGlobalTypes().Boolean;
-			StringValue = "false";
-		}
-		| Double
-		{
-			Type 				= context.GetGlobalTypes().Double;
-			StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
-			Value : double;
+    | True
+    {
+      Type         = context.GetGlobalTypes().Boolean;
+      StringValue = "true";
+    }
+    | False
+    {
+      Type         = context.GetGlobalTypes().Boolean;
+      StringValue = "false";
+    }
+    | Double
+    {
+      Type         = context.GetGlobalTypes().Double;
+      StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
+      Value : double;
 
-		}
-		| Int
-		{
-			Type 				= context.GetGlobalTypes().Int;
-			StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
-			Value : int;
-		}
-		| SStr
-		{
-			Type 				= context.GetGlobalTypes().String;
-			StringValue = Value.Value;
-			Value : string;
-		}
-		| DStr
-		{
-			Type 				= context.GetGlobalTypes().String;
-			StringValue = Value.Value;
-			Value : string;
-		}
-		| SimpleReference
-		{
-			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
-			Reference.Scope = Scope;
-			Type = Ref.Symbol.Type;
-			Reference : Reference;
-		}
-		| MemberAccess
-		{
-			in PropertyRef : Ref[PropertySymbol] = Reference.Ref.Resolve();
+    }
+    | Int
+    {
+      Type         = context.GetGlobalTypes().Int;
+      StringValue = Value.Value.ToString(CultureInfo.InvariantCulture);
+      Value : int;
+    }
+    | SStr
+    {
+      Type         = context.GetGlobalTypes().String;
+      StringValue = Value.Value;
+      Value : string;
+    }
+    | DStr
+    {
+      Type         = context.GetGlobalTypes().String;
+      StringValue = Value.Value;
+      Value : string;
+    }
+    | SimpleReference
+    {
+      out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
+      Reference.Scope = Scope;
+      Type = Ref.Symbol.Type;
+      Reference : Reference;
+    }
+    | MemberAccess
+    {
+      in PropertyRef : Ref[PropertySymbol] = Reference.Ref.Resolve();
 
-			Type = PropertyRef.Symbol.Type;
-			Qualifier.Scope = Scope;
-			Reference.Scope = Qualifier.Type.Scope;
+      Type = PropertyRef.Symbol.Type;
+      Qualifier.Scope = Scope;
+      Reference.Scope = Qualifier.Type.Scope;
 
-			Qualifier : Expr;
-			Reference : Reference;
-		}
-		| ArrayAccess
-		{
-			out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
-			Reference.Scope = Scope;
-			Index.Scope = Scope;
-			Index.ExpectedType = context.GetGlobalTypes().Int;
-			Type = context.GetGlobalTypes().GetArrayElemType(Ref.Symbol.Type);
+      Qualifier : Expr;
+      Reference : Reference;
+    }
+    | ArrayAccess
+    {
+      out Ref: Ref[LocalVariableSymbol] = Reference.Ref.Resolve();
+      Reference.Scope = Scope;
+      Index.Scope = Scope;
+      Index.ExpectedType = context.GetGlobalTypes().Int;
+      Type = context.GetGlobalTypes().GetArrayElemType(Ref.Symbol.Type);
 
-			Reference: Reference;
-			Index: Expr;
+      Reference: Reference;
+      Index: Expr;
 
-			unless (NLiquidTypeUnifier.Instance.TryUnify(Index.Type, Index.ExpectedType))
-				Error(context, $"Expected $(Index.ExpectedType) type of index but got $(Index.Type)");
-		}
-		| Error        { Error(context, "Expected: Expr '}}'"); }
-		| Call
-		{
-			out Ref : Ref[FuncSymbol] = Helpers.ResolveCall(FuncName.Ref, Arg0.Type, Args.Type);
+      unless (NLiquidTypeUnifier.Instance.TryUnify(Index.Type, Index.ExpectedType))
+        Error(context, $"Expected $(Index.ExpectedType) type of index but got $(Index.Type)");
+    }
+    | Error        { Error(context, "Expected: Expr '}}'"); }
+    | Call
+    {
+      out Ref : Ref[FuncSymbol] = Helpers.ResolveCall(FuncName.Ref, Arg0.Type, Args.Type);
 
-			FuncName.Scope = Scope;
-			Arg0.Scope     = Scope;
-			Args.Scope     = Scope;
-			Type           = Ref.Symbol.Result;
+      FuncName.Scope = Scope;
+      Arg0.Scope     = Scope;
+      Args.Scope     = Scope;
+      Type           = Ref.Symbol.Result;
 
-			FuncName : Reference;
-			Arg0    : Expr;
-			Args    : Expr*;
-		}
-		| Range
-		{
-			Type          = context.GetGlobalTypes().GetArrayType(context.GetGlobalTypes().Int);
+      FuncName : Reference;
+      Arg0    : Expr;
+      Args    : Expr*;
+    }
+    | Range
+    {
+      Type          = context.GetGlobalTypes().GetArrayType(context.GetGlobalTypes().Int);
 
-			From : Expr;
-			To   : Expr;
+      From : Expr;
+      To   : Expr;
 
-			From.Scope = Scope;
-			To.Scope   = Scope;
+      From.Scope = Scope;
+      To.Scope   = Scope;
 
-			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, To.Type))
-				From.Error(context, $"$(From.Type) is not compatible with $(To.Type).");
-			unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, context.GetGlobalTypes().Int))
-				From.Error(context, $"Expected int expression but found $(From.Type).");
-		}
-		| Or           : OrAndExpr {}
-		| And          : OrAndExpr {}
-		| Contains     : ContainsExpr {}
-		| Equal        : EqualExpr{ }
-		| NotEqual     : EqualExpr{ }
-	}
+      unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, To.Type))
+        From.Error(context, $"$(From.Type) is not compatible with $(To.Type).");
+      unless (NLiquidTypeUnifier.Instance.TryUnify(From.Type, context.GetGlobalTypes().Int))
+        From.Error(context, $"Expected int expression but found $(From.Type).");
+    }
+    | Or           : OrAndExpr {}
+    | And          : OrAndExpr {}
+    | Contains     : ContainsExpr {}
+    | Equal        : EqualExpr{ }
+    | NotEqual     : EqualExpr{ }
+  }
 
-	abstract ast QualifiedReference : BindableAst
-	{
-		out Ref : Ref[DeclarationSymbol];
+  abstract ast QualifiedReference : BindableAst
+  {
+    out Ref : Ref[DeclarationSymbol];
 
-		| Simple
-			{
-				Name.Scope  = Scope;
-				Ref         = Name.Ref.Resolve();
+    | Simple
+      {
+        Name.Scope  = Scope;
+        Ref         = Name.Ref.Resolve();
 
-				Name : Reference;
-			}
+        Name : Reference;
+      }
 
-		| Qualified
-			{
-				Qualifier.Scope = Scope;
-				Name.Scope      = Qualifier.Ref.Scope;
-				Ref             = Name.Ref.Resolve();
+    | Qualified
+      {
+        Qualifier.Scope = Scope;
+        Name.Scope      = Qualifier.Ref.Scope;
+        Ref             = Name.Ref.Resolve();
 
-				Qualifier : QualifiedReference;
-				Name      : Reference;
-			}
-	}
+        Qualifier : QualifiedReference;
+        Name      : Reference;
+      }
+  }
 
-	abstract ast TypeReference
-	{
-		in Type : TypeSymbol;
+  abstract ast TypeReference
+  {
+    in Type : TypeSymbol;
 
-		| Nil        { Type = context.GetGlobalTypes().Nil;        }
-		| Double     { Type = context.GetGlobalTypes().Double;     }
-		| Int        { Type = context.GetGlobalTypes().Int;        }
-		| Boolean    { Type = context.GetGlobalTypes().Boolean;    }
-		| String     { Type = context.GetGlobalTypes().String;     }
-		| Object     {  }
-		| Array      { ElemType : TypeReference; Type = context.GetGlobalTypes().GetArrayType(ElemType.Type); }
-		| Dictionary { Type = context.GetGlobalTypes().Dictionary; }
-	}
+    | Nil        { Type = context.GetGlobalTypes().Nil;        }
+    | Double     { Type = context.GetGlobalTypes().Double;     }
+    | Int        { Type = context.GetGlobalTypes().Int;        }
+    | Boolean    { Type = context.GetGlobalTypes().Boolean;    }
+    | String     { Type = context.GetGlobalTypes().String;     }
+    | Object     {  }
+    | Array      { ElemType : TypeReference; Type = context.GetGlobalTypes().GetArrayType(ElemType.Type); }
+    | Dictionary { Type = context.GetGlobalTypes().Dictionary; }
+  }
 
-	declaration Nil         : Type {}
-	declaration Int         : Type {}
-	declaration Double      : Type {}
-	declaration Boolean     : Type {}
-	declaration String      : Type {}
-	declaration Dictionary  : Type {}
-	declaration Namespace : NamespaceMambers, Container
-	{
-		symbol { Scope = MemberTable; }
-		Members : NamespaceMambers*;
-	}
-	abstract ast NamespaceMambers
-	{
-	}
-	declaration UserDefinedType : Type, NamespaceMambers, Container
-	{
-		symbol { Scope = MemberTable; }
-	}
-	declaration Property
-	{
-		symbol
-		{
-			in Type : TypeSymbol;
-		}
-	}
-	declaration Array       : Type
-	{
-		symbol
-		{
-			in ElemType : TypeSymbol;
-		}
-	}
-	declaration Func		: Type
-	{
-		symbol
-		{
-			in Parameters : ImmutableArray[TypeSymbol];
-			in Result     : TypeSymbol;
+  declaration Nil         : Type {}
+  declaration Int         : Type {}
+  declaration Double      : Type {}
+  declaration Boolean     : Type {}
+  declaration String      : Type {}
+  declaration Dictionary  : Type {}
+  declaration Namespace : NamespaceMambers, Container
+  {
+    symbol { Scope = MemberTable; }
+    Members : NamespaceMambers*;
+  }
+  abstract ast NamespaceMambers
+  {
+  }
+  declaration UserDefinedType : Type, NamespaceMambers, Container
+  {
+    symbol { Scope = MemberTable; }
+  }
+  declaration Property
+  {
+    symbol
+    {
+      in Type : TypeSymbol;
+    }
+  }
+  declaration Array       : Type
+  {
+    symbol
+    {
+      in ElemType : TypeSymbol;
+    }
+  }
+  declaration Func    : Type
+  {
+    symbol
+    {
+      in Parameters : ImmutableArray[TypeSymbol];
+      in Result     : TypeSymbol;
 
-			Kind = "function type";
-		}
-	}
+      Kind = "function type";
+    }
+  }
 }

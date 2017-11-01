@@ -11,10 +11,10 @@ using System.Linq;
 
 namespace NLiquid
 {
-	[Record]
-	public class ProjectData
-	{
-		public Context : NLiquidDependentPropertyEvalContext;
-		public Root    : NamespaceSymbol;
-	}
+  [Record]
+  public class ProjectData
+  {
+    public Context : NLiquidDependentPropertyEvalContext;
+    public Root    : NamespaceSymbol;
+  }
 }

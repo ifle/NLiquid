@@ -113,9 +113,6 @@
     <Compile Include="Parser\Ast.nitra">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Context.n">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Parser\Grammar.nitra" />
     <Compile Include="Parser\Language.nitra">
       <SubType>Code</SubType>
