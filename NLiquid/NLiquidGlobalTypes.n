@@ -87,9 +87,8 @@ namespace NLiquid
 			{
 				| IntSymbol       => typeof(int)
 				| DoubleSymbol    => typeof(double)
+				| BooleanSymbol   => typeof(bool)
 				| StringSymbol    => typeof(string)
-				| BooleanSymbol   => typeof(bool)
-				| BooleanSymbol   => typeof(bool)
 				| _               => null
 			}
 		}
